@@ -6,10 +6,11 @@
         <script src="glMatrix-0.9.5.min.js"></script>
         <script src="webgl-utils.js"></script>
         <script src="d3.v5.min.js"></script>
-        <script src="main.js"></script>        
+        <script src="ThreeDBar.js"></script>
+        <script src="ThreeDBarChart.js"></script>        
      </head>
-<body onload="webGLStart();">
-    <canvas id="barChart" style="border: none;" width="600" height="500"></canvas>
+<body>
+    <canvas class="barChart" style="border: none;" width="600" height="500"></canvas>
 
     <br/>
 <script id="shader-fs" type="x-shader/x-fragment">
@@ -35,6 +36,9 @@
     gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
     vColor = aVertexColor;
   }
+</script>
+<script>
+    const bar1 = new ThreeDBarChart(document.querySelector('.barChart'), {}, 'data1.csv');
 </script>
 </body>
 </html>
