@@ -1,7 +1,8 @@
 ﻿class ThreeDBar {
 
-    constructor(gl, config) {
+    constructor(gl, shaderProgram, mvMatrix, rCube, config) {
         this.gl = gl;
+        this.shaderProgram = shaderProgram;
         this.cfg = {
             x: 0,
             y: 0,
@@ -13,11 +14,11 @@
             margin: {top: 50, right: 50, bottom: 50, left: 50},
             barPadding: 0.1
         };
-        this.mvMatrix = mat4.create();
+        this.mvMatrix = mvMatrix;
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
-        this.rCube = 0;
-        this.lastTime = 0;                    
+        this.rCube = rCube;
+        //this.lastTime = 0;                    
         this.loadConfig(config);
         this.webGLStart();
         
@@ -34,32 +35,8 @@
     } 
 
     webGLStart() {
-        this.initShaders(); 
         this.initBuffers(this.cfg.width / 2, this.cfg.height);
         this.tick();
-    }
-
-    initShaders() {
-        let fragmentShader = this.getShader(this.gl, "shader-fs");
-        let vertexShader = this.getShader(this.gl, "shader-vs");
-
-        this.shaderProgram = this.gl.createProgram();
-        this.gl.attachShader(this.shaderProgram, vertexShader);
-        this.gl.attachShader(this.shaderProgram, fragmentShader);
-        this.gl.linkProgram(this.shaderProgram);
-
-        if (!this.gl.getProgramParameter(this.shaderProgram, this.gl.LINK_STATUS)) {
-           alert("Could not initialise shaders");
-        }
-
-        this.gl.useProgram(this.shaderProgram);
-        this.shaderProgram.vertexPositionAttribute = this.gl.getAttribLocation(this.shaderProgram, "aVertexPosition");
-        this.gl.enableVertexAttribArray(this.shaderProgram.vertexPositionAttribute);
-        this.shaderProgram.vertexColorAttribute = this.gl.getAttribLocation(this.shaderProgram, "aVertexColor");
-        this.gl.enableVertexAttribArray(this.shaderProgram.vertexColorAttribute);
-        
-        this.shaderProgram.pMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uPMatrix");
-        this.shaderProgram.mvMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uMVMatrix");
     }
 
     initBuffers(width, height) {
@@ -144,20 +121,18 @@
     }
 
     tick() {
-        //requestAnimFrame(tick);
+        //requestAnimFrame(() => {this.tick();});
         this.drawScene();
-        //animate();
+        //this.animate();
     }
 
     drawScene() {
-        //gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-        //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         mat4.perspective(45, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
-        mat4.identity(this.mvMatrix);
+        //mat4.identity(this.mvMatrix);
         
-        mat4.translate(this.mvMatrix, [this.cfg.offset, 0.0, -7.0]);
+        //mat4.translate(this.mvMatrix, [this.cfg.offset, 0.0, -7.0]);
         //mvPushMatrix();
-        mat4.rotate(this.mvMatrix, this.degToRad(this.rCube), [0, 1, 0]);  
+        //mat4.rotate(this.mvMatrix, this.degToRad(this.rCube), [0, 1, 0]);  
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexPositionBuffer);
         this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.cubeVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexColorBuffer);
@@ -167,40 +142,6 @@
         this.gl.drawElements(this.gl.TRIANGLES, this.cubeVertexIndexBuffer.numItems, this.gl.UNSIGNED_SHORT, 0);
         
         //mvPopMatrix();
-    }
-
-    getShader(gl, id) {
-        let shaderScript = document.getElementById(id);
-        if (!shaderScript) {
-            return null;
-        }
-
-        let str = "";
-        let k = shaderScript.firstChild;
-        while (k) {
-            if (k.nodeType == 3)
-                str += k.textContent;
-            k = k.nextSibling;
-        }
-
-        let shader;
-        if (shaderScript.type == "x-shader/x-fragment") {
-            shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
-        } else if (shaderScript.type == "x-shader/x-vertex") {
-            shader = this.gl.createShader(this.gl.VERTEX_SHADER);
-        } else {
-            return null;
-        }
-
-        this.gl.shaderSource(shader, str);
-        this.gl.compileShader(shader);
-
-        if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-            alert(this.gl.getShaderInfoLog(shader));
-            return null;
-        }
-
-        return shader;
     }
 
     degToRad(degrees) {
