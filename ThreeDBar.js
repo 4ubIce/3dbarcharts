@@ -43,40 +43,40 @@
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexPositionBuffer);
         let vertices = [
           // Front face
-          -width, -1.0,  1.0,
-           width, -1.0,  1.0,
-           width, height,  1.0,
-          -width, height,  1.0,
+          -width, -1.0,  width,
+           width, -1.0,  width,
+           width, height,  width,
+          -width, height,  width,
 
           // Back face
-          -width, -1.0, -1.0,
-          -width, height, -1.0,
-           width, height, -1.0,
-           width, -1.0, -1.0,
+          -width, -1.0, -width,
+          -width, height, -width,
+           width, height, -width,
+           width, -1.0, -width,
 
           // Top face
-          -width, height, -1.0,
-          -width, height,  1.0,
-           width, height,  1.0,
-           width, height, -1.0,
+          -width, height, -width,
+          -width, height,  width,
+           width, height,  width,
+           width, height, -width,
 
           // Bottom face
-          -width, -1.0, -1.0,
-           width, -1.0, -1.0,
-           width, -1.0,  1.0,
-          -width, -1.0,  1.0,
+          -width, -1.0, -width,
+           width, -1.0, -width,
+           width, -1.0,  width,
+          -width, -1.0,  width,
 
           // Right face
-           width, -1.0, -1.0,
-           width, height, -1.0,
-           width, height,  1.0,
-           width, -1.0,  1.0,
+           width, -1.0, -width,
+           width, height, -width,
+           width, height,  width,
+           width, -1.0,  width,
 
           // Left face
-          -width, -1.0, -1.0,
-          -width, -1.0,  1.0,
-          -width, height,  1.0,
-          -width, height, -1.0,
+          -width, -1.0, -width,
+          -width, -1.0,  width,
+          -width, height,  width,
+          -width, height, -width,
         ];
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
         this.cubeVertexPositionBuffer.itemSize = 3;

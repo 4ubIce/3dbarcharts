@@ -60,7 +60,7 @@ class ThreeDBarChart {
     }
 
     loadDataAndDraw(file) {
-        d3.csv(file)
+        d3.json(file)
           .then((d) => {this.data = d;this.draw();});
           //.catch((error) => {console.error('can not read file: ' + file + ' ' + new Error().stack);});        
     }    
@@ -80,14 +80,16 @@ class ThreeDBarChart {
         mat4.rotate(this.mvMatrix, this.animationSpeed, [this.xRotation, this.yRotation, this.zRotation]);
         
         const yScale = d3.scaleLinear()
-                       .domain([0, d3.max(data, function(d) {return +d.Value})])
+                       .domain([0, d3.max(data, function(d , i) {return +d[i].Value})])
                        .range([-1, 1]);
         if (this.gl) {
-            for (var i = 0; i < data.length; i++) {
-                this.mvPushMatrix();
-                mat4.translate(this.mvMatrix, [i / 2 - 2, 0.0, 0.0]);
-                const bar1 = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(data[i].Value), offset: i / 2 - 2});
-                this.mvPopMatrix();
+            for (var i = 0; i < data.length; i++) {    
+                for (var j = 0; j < data[i].length; j++) {
+                    this.mvPushMatrix();
+                    mat4.translate(this.mvMatrix, [j / 2 - 2, 0.0, i * 0.5]);
+                    const bar1 = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(data[i][j].Value), offset: j / 2 - 2});
+                    this.mvPopMatrix();
+                };
             };
         }                        
          
