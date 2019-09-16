@@ -11,17 +11,26 @@ class ThreeDBarChart {
             barColor: '#1f77b4',
             lineColor: 'red',
             margin: {top: 50, right: 50, bottom: 50, left: 50},
-            barPadding: 0.1
+            barPadding: 0.1,
+            animationSpeed: -0.02
         };
         this.gl = this.initGL(this.element);
-        this.rCube = 0;
+        this.animationOn = 0;
         this.lastTime = 0;
         this.mvMatrix = mat4.create();
-        this.mvMatrixStack = [];            
+        mat4.identity(this.mvMatrix);
+        mat4.translate(this.mvMatrix, [0, 0.0, -10.0]);        
+        this.mvMatrixStack = [];
+        this.xRotation = 0;
+        this.yRotation = 0;
+        this.zRotation = 0;
+        this.animationSpeed = this.getAnimationSpeed();
         this.loadConfig(config);
         this.init();
         this.loadDataAndDraw(file);
-        
+        this.element.onmousedown = () => {this.mouseDownEvent(event);};
+        this.element.onmouseup = () => {this.mouseUpEvent();};
+        this.element.oncontextmenu = () => {return false;};
     }
     
     getWidth() {
@@ -30,7 +39,11 @@ class ThreeDBarChart {
     
     getHeight() {
         return this.cfg.height;
-    }    
+    }
+    
+    getAnimationSpeed() {
+        return this.cfg.animationSpeed;
+    }        
     
     loadConfig(config) {
         if ('undefined' !== typeof config) {
@@ -48,23 +61,23 @@ class ThreeDBarChart {
 
     loadDataAndDraw(file) {
         d3.csv(file)
-          .then((d) => {this.data = d;this.tick();});
+          .then((d) => {this.data = d;this.draw();});
           //.catch((error) => {console.error('can not read file: ' + file + ' ' + new Error().stack);});        
     }    
     
     tick() {
-        requestAnimFrame(() => {this.tick();});
-        this.draw(this.data);
-        this.animate();
+        if (this.animationOn == 1) {
+            requestAnimFrame(() => {this.tick();});
+            this.draw();
+        }
     }    
     
-    draw(data) {
-
+    draw() {
+        
+        let data = this.data;
         let w = this.getWidth();
         let h = this.getHeight();
-        mat4.identity(this.mvMatrix);
-        mat4.translate(this.mvMatrix, [0, 0.0, -10.0]);
-        mat4.rotate(this.mvMatrix, this.degToRad(this.rCube), [0, 1, 0]);
+        mat4.rotate(this.mvMatrix, this.animationSpeed, [this.xRotation, this.yRotation, this.zRotation]);
         
         const yScale = d3.scaleLinear()
                        .domain([0, d3.max(data, function(d) {return +d.Value})])
@@ -73,7 +86,7 @@ class ThreeDBarChart {
             for (var i = 0; i < data.length; i++) {
                 this.mvPushMatrix();
                 mat4.translate(this.mvMatrix, [i / 2 - 2, 0.0, 0.0]);
-                const bar1 = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, this.rCube, {height: yScale(data[i].Value), offset: i / 2 - 2});
+                const bar1 = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(data[i].Value), offset: i / 2 - 2});
                 this.mvPopMatrix();
             };
         }                        
@@ -90,7 +103,8 @@ class ThreeDBarChart {
             gl.clearColor(0.0, 0.0, 0.0, 0.0);
             gl.enable(gl.DEPTH_TEST);
             gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);            
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                        
         } catch(e) {
         }
         if (!gl) {
@@ -160,16 +174,6 @@ class ThreeDBarChart {
         return degrees * Math.PI / 180;
     }
     
-    animate() {
-        let timeNow = new Date().getTime();
-        if (this.lastTime != 0) {
-          let elapsed = timeNow - this.lastTime;
-
-          this.rCube -= (75 * elapsed) / 1000.0;
-        }
-        this.lastTime = timeNow;
-    }
-    
     mvPushMatrix() {
         let copy = mat4.create();
         mat4.set(this.mvMatrix, copy);
@@ -181,5 +185,24 @@ class ThreeDBarChart {
           throw "Invalid popMatrix!";
         }
         this.mvMatrix = this.mvMatrixStack.pop();
+    }
+    
+    mouseDownEvent(e) {
+        if (e.which == 1) {
+            this.xRotation = 1;
+        } else if (e.which == 2) {
+            this.zRotation = 1;
+        } else if (e.which == 3) {
+            this.yRotation = 1;
+        }
+        this.animationOn = 1;
+        this.tick();
+    }
+    
+    mouseUpEvent() {
+        this.xRotation = 0;
+        this.yRotation = 0;
+        this.zRotation = 0;
+        this.animationOn = 0;
     }               
 }

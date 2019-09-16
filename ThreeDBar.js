@@ -1,6 +1,6 @@
 ﻿class ThreeDBar {
 
-    constructor(gl, shaderProgram, mvMatrix, rCube, config) {
+    constructor(gl, shaderProgram, mvMatrix, config) {
         this.gl = gl;
         this.shaderProgram = shaderProgram;
         this.cfg = {
@@ -17,8 +17,6 @@
         this.mvMatrix = mvMatrix;
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
-        this.rCube = rCube;
-        //this.lastTime = 0;                    
         this.loadConfig(config);
         this.webGLStart();
         
@@ -121,18 +119,12 @@
     }
 
     tick() {
-        //requestAnimFrame(() => {this.tick();});
         this.drawScene();
-        //this.animate();
     }
 
     drawScene() {
         mat4.perspective(45, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
-        //mat4.identity(this.mvMatrix);
-        
-        //mat4.translate(this.mvMatrix, [this.cfg.offset, 0.0, -7.0]);
-        //mvPushMatrix();
-        //mat4.rotate(this.mvMatrix, this.degToRad(this.rCube), [0, 1, 0]);  
+ 
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexPositionBuffer);
         this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.cubeVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexColorBuffer);
@@ -152,16 +144,6 @@
        this.gl.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, this.pMatrix);
        this.gl.uniformMatrix4fv(this.shaderProgram.mvMatrixUniform, false, this.mvMatrix);
     }
-
-    animate() {
-        let timeNow = new Date().getTime();
-        if (this.lastTime != 0) {
-          let elapsed = timeNow - this.lastTime;
-
-          this.rCube -= (75 * elapsed) / 1000.0;
-        }
-        this.lastTime = timeNow;
-    } 
 
     mvPushMatrix() {
         let copy = mat4.create();
