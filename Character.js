@@ -9,21 +9,20 @@ class Character {
             z: 0,
             height: 1,
             width: 1,
-            xLinePadding: 0.5,
-            yLinePadding: 0.5,
-            ledge: 0.0,
+            text: '',            
+            textSize: 11,
+            textFont: 'Georgia',
+            textColor: '#000000',            
             rotate: 0,
             xRotation: 0,
-            yRotation: 0,            
-            barColor: '#1f77b4',
-            lineColor: 'red',
-            margin: {top: 50, right: 50, bottom: 50, left: 50},
+            yRotation: 0            
         };
         this.canvas;
         this.mvMatrix = mvMatrix;
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
         this.loadConfig(config);
+        this.webGLStart();
     }
     
     getX() {
@@ -46,17 +45,21 @@ class Character {
         return this.cfg.width;
     }
     
-    getxLinePadding() {
-        return this.cfg.xLinePadding;
+    getText() {
+        return this.cfg.text;
     }
     
-    getyLinePadding() {
-        return this.cfg.yLinePadding;
-    }   
-     
-    getyLedge() {
-        return this.cfg.ledge;
+    getTextSize() {
+        return this.cfg.textSize;
     }
+    
+    getTextFont() {
+        return this.cfg.textFont;
+    }        
+    
+    getTextColor() {
+        return this.cfg.textColor;
+    }        
     
     getRotate() {
         return this.degToRad(this.cfg.rotate);
@@ -89,22 +92,20 @@ class Character {
 
     initTextCanvas() {
         
-        let text = 'x1';
-        let padding = 12;
-        let size = 24;
+        let text = this.getText();
+        let size = this.getTextSize();
+        let font = this.getTextFont();
         this.canvas = document.createElement('canvas');
         let context = this.canvas.getContext('2d');
         
-        context.font = size + "px Georgia";
-/*        let textWidth = context.measureText(text).width;
-        this.canvas.width = textWidth + padding;
-        this.canvas.height = size + padding;
-*/        
-        this.canvas.width = getPowerOfTwo(context.measureText(text).width);
-        this.canvas.height = getPowerOfTwo(size);        
-        context.font = size + "px Georgia";
-        context.fillStyle = "#1f77b4";
-        context.fillText(text, 1, 30);
+        context.font = size + 'px ' + font;
+        this.canvas.width = this.getPowerOfTwo(context.measureText(text).width);
+        this.canvas.height = this.getPowerOfTwo(size);
+        context.font = size + 'px ' + font;
+        context.fillStyle = this.getTextColor();
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText(text, this.canvas.width/2, this.canvas.height/2);
         //context.strokeRect(0, 0, this.canvas.width, this.canvas.height);
         document.body.insertBefore(this.canvas, document.getElementById('barChart'));            
     }
@@ -120,8 +121,8 @@ class Character {
         this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
         this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, textureCanvas);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_NEAREST);
         this.gl.generateMipmap(this.gl.TEXTURE_2D);
     }
 
@@ -147,20 +148,11 @@ class Character {
         
         this.squareVertexTextureCoordBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexTextureCoordBuffer);
-/*        let textureCoords = [
-            0.0, 0.0,
-            1.0, 0.0,
-            1.0, 1.0,
-            0.0, 1.0
-        ];
-*/
         let textureCoords = [
             1.0, 1.0,
             0.0, 1.0,
             1.0, 0.0,
             0.0, 0.0
-            
-            
         ];        
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(textureCoords), this.gl.STATIC_DRAW);
         this.squareVertexTextureCoordBuffer.itemSize = 2;
@@ -204,22 +196,20 @@ class Character {
        this.gl.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, this.pMatrix);
        this.gl.uniformMatrix4fv(this.shaderProgram.mvMatrixUniform, false, this.mvMatrix);
     }
-    
-    div(val, by){
-        return Math.trunc(val / by);
-    }
 
     degToRad(degrees) {
         return degrees * Math.PI / 180;
-    }    
+    }
+        
+    getPowerOfTwo(value, pow) {
+        pow = pow || 1;
+        while(pow<value) {
+           pow *= 2;
+        }
+        return pow;
+    }
 }
 
-function getPowerOfTwo(value, pow) {
-    pow = pow || 1;
-    while(pow<value) {
-       pow *= 2;
-    }
-    return pow;
-}
+
 
 

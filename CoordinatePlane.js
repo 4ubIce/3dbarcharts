@@ -9,20 +9,18 @@ class CoordinatePlane {
             z: 0,
             height: 1,
             width: 1,
-            xLinePadding: 0.5,
-            yLinePadding: 0.5,
+            xTicksCount: 5,
+            yTicksCount: 3,
             ledge: 0.0,
             rotate: 0,
             xRotation: 0,
-            yRotation: 0,            
-            barColor: '#1f77b4',
-            lineColor: 'red',
-            margin: {top: 50, right: 50, bottom: 50, left: 50},
+            yRotation: 0
         };
         this.mvMatrix = mvMatrix;
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
         this.loadConfig(config);
+        this.webGLStart();
     }
     
     getX() {
@@ -45,12 +43,12 @@ class CoordinatePlane {
         return this.cfg.width;
     }
     
-    getxLinePadding() {
-        return this.cfg.xLinePadding;
+    getxTicksCount() {
+        return this.cfg.xTicksCount;
     }
     
-    getyLinePadding() {
-        return this.cfg.yLinePadding;
+    getyTicksCount() {
+        return this.cfg.yTicksCount;
     }   
      
     getyLedge() {
@@ -91,58 +89,35 @@ class CoordinatePlane {
         let z = this.getZ();
         let width = this.getWidth();
         let height = this.getHeight();
-        let xLinePadding = this.getxLinePadding();
-        let yLinePadding = this.getyLinePadding();
+        let xTicksCount = this.getxTicksCount();
+        let yTicksCount = this.getyTicksCount();
         let ledge = this.getyLedge();
-        let xlineCount = this.div(width, xLinePadding) + 1;
-        let ylineCount = this.div(height, yLinePadding) + 1;
-/*        
-        x
-        [0,    0,    0,    |  width,  0,      0]
-        [0,    0,    0.2,  |  width,  0,      0.2]
-        [0,    0,    0.4,  |  width,  0,      0.4]
-        
-        y
-        [0,    0,    0,    |  0,      width,  0]
-        [0.2,  0,    0,    |  0.2,    width,  0]
-        [0.4,  0,    0,    |  0.4,    width,  0]
-        
-        z
-        [0,    0,    0,    |  0,      0,      width]
-        [0,    0.2,  0,    |  0,      0.2,    width]
-        [0,    0.4,  0,    |  0,      0.4,    width]       
-*/             
+        let xLinePadding = width / (xTicksCount - 1);//this.div(width, xLinePadding) + 1;
+        let yLinePadding = height / (yTicksCount - 1);//this.div(height, yLinePadding) + 1;
+        ///width = width - xLinePadding;
+        ///height = height;// - yLinePadding;
   
         this.cubeVertexPositionBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexPositionBuffer);
         let vertices = [];
-        for (let i = 0; i < ylineCount; i++) {
+        for (let i = 0; i < yTicksCount; i++) {
            vertices = vertices.concat([x - ledge,         y + i * yLinePadding, z,
                                        x + width + ledge, y + i * yLinePadding, z]);
         }
         
-        for (let i = 0; i < xlineCount; i++) {
+        for (let i = 0; i < xTicksCount; i++) {
            vertices = vertices.concat([x + i * xLinePadding, y - ledge,          z,
-                                       x + i * xLinePadding, y + height + ledge, z]);                                       
+                                       x + i * xLinePadding, y + height + ledge, z]);
         }        
       
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
         this.cubeVertexPositionBuffer.itemSize = 3;
-        this.cubeVertexPositionBuffer.numItems = 2 * (xlineCount + ylineCount);
+        this.cubeVertexPositionBuffer.numItems = 2 * (xTicksCount + yTicksCount);
 
         this.cubeVertexColorBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexColorBuffer);
-        let colors = [
-          [0.0, 0.0, 0.0, 1.0]
-        ];
-        let unpackedColors = [];
-        for (let i in colors) {
-            let color = colors[i];
-            for (let j = 0; j < 4; j++) {
-               unpackedColors = unpackedColors.concat(color);
-            }
-        }
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(unpackedColors), this.gl.STATIC_DRAW);
+        let color = 0;
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(color), this.gl.STATIC_DRAW);
         this.cubeVertexColorBuffer.itemSize = 1;
         this.cubeVertexColorBuffer.numItems = 1;
     }

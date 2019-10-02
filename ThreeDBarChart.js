@@ -5,14 +5,13 @@ class ThreeDBarChart {
         this.cfg = {
             x: 0,
             y: 0,
-            width: 600,
-            height: 500,
+            width: 4,
+            height: 1,
+            depth: 1,
             offset: 0,
-            barColor: '#1f77b4',
-            lineColor: 'red',
-            margin: {top: 50, right: 50, bottom: 50, left: 50},
-            barPadding: 0.1,
-            animationSpeed: -0.02
+            animationSpeed: -0.02,
+            xAxisTicksCount: 5,
+            yAxisTicksCount: 4
         };
         this.gl = this.initGL(this.element);
         this.animationOn = 0;
@@ -40,9 +39,25 @@ class ThreeDBarChart {
         return this.cfg.height;
     }
     
+    getDepth() {
+        return this.cfg.depth;
+    } 
+    
+    getHeight() {
+        return this.cfg.height;
+    }    
+    
     getAnimationSpeed() {
         return this.cfg.animationSpeed;
-    }        
+    }
+    
+    getxAxisTicksCount() {
+        return this.cfg.xAxisTicksCount;
+    } 
+    
+    getyAxisTicksCount() {
+        return this.cfg.yAxisTicksCount;
+    }            
     
     loadConfig(config) {
         if ('undefined' !== typeof config) {
@@ -72,36 +87,45 @@ class ThreeDBarChart {
     }    
     
     drawScene() {
-        const bar11 = new Character(this.gl, this.shaderProgram, this.mvMatrix, {}).webGLStart();
+        
         let offset = 2;
         let data = this.data;
+        let rowCount = data.length;
+        let xLength;
+        let yLength = 1;
+        let zLength = 1;
+        let xBarPadding;
+        let zBarPadding;
         let w = this.getWidth();
         let h = this.getHeight();
-        mat4.rotate(this.mvMatrix, this.animationSpeed, [this.xRotation, 0, this.zRotation]);
-        
-        let max = d3.max(data, function(row) {return d3.max(row, function(val) {return val.Value})});
+        let d = this.getDepth();
+        let xAxisTicksCount = this.getxAxisTicksCount();
+        let yAxisTicksCount = this.getyAxisTicksCount();        
+        let maxValue = d3.max(data, function(row) {return d3.max(row, function(val) {return val.Value})});
+        let maxColumnCount = d3.max(data, function(row) {return row.length});
         const yScale = d3.scaleLinear()
-                       .domain([0, max])
-                       .range([-1, 1]);
-                       
+                       .domain([0, maxValue])
+                       .range([-1, h]);        
+
         if (this.gl) {
+            mat4.rotate(this.mvMatrix, this.animationSpeed, [this.xRotation, 0, this.zRotation]);
             for (let i = 0; i < data.length; i++) {    
-                //const line1 = new Line(this.gl, this.shaderProgram, this.mvMatrix, {x1: -3, y1: -1, z1: i * 0.5, x2: 3, y2: -1, z2: i * 0.5});
                 for (let j = 0; j < data[i].length; j++) {
                     this.mvPushMatrix();
-                    mat4.translate(this.mvMatrix, [j / offset - data[i].length / (2 * offset + 0.5), 0.0, i * 0.5]);
+                    mat4.translate(this.mvMatrix, [-w / 2 + j * w / (maxColumnCount - 1), 0.0, i * d / (rowCount - 1)]);
                     const bar1 = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(data[i][j].Value)});
                     this.mvPopMatrix();
                 };
             };
+            
             this.mvPushMatrix();     
-            const axisX = new CoordinatePlane(this.gl, this.shaderProgram, this.mvMatrix, {x: -2, y: 0, z: 1, width: 4, height: 1, ledge: 0.2, rotate: 90, xRotation: 1}).webGLStart();
+            const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: 0, z: 1, width: w, height: d, xTicksCount: maxColumnCount, yTicksCount: rowCount, ledge: 0.2, rotate: 90, xRotation: 1});
             this.mvPopMatrix();            
             this.mvPushMatrix();     
-            const axisY = new CoordinatePlane(this.gl, this.shaderProgram, this.mvMatrix, {x: -2, y: -1, z: -0.2, width: 4, height: 1 + yScale(max), ledge: 0.2}).webGLStart();
+            const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -1, z: -0.2, width: w, height: 1 + yScale(maxValue), xTicksCount: maxColumnCount, yTicksCount: yAxisTicksCount, ledge: 0.2});
             this.mvPopMatrix();
             this.mvPushMatrix();     
-            const axisZ = new CoordinatePlane(this.gl, this.shaderProgram, this.mvMatrix, {x: -1, y: -1, z: -2.2, width: 1, height: 1 + yScale(max), ledge: 0.2, rotate: 90, yRotation: 1}).webGLStart();
+            const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -d, y: -1, z: -w / 2 - 0.2, width: d, height: 1 + yScale(maxValue), xTicksCount: rowCount, yTicksCount: yAxisTicksCount, ledge: 0.2, rotate: 90, yRotation: 1});
             this.mvPopMatrix();            
         }                        
     }
