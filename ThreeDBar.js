@@ -1,6 +1,8 @@
-﻿class ThreeDBar {
+﻿'use strict';
+class ThreeDBar extends ClassHelper {
 
     constructor(gl, shaderProgram, mvMatrix, config) {
+        super();
         this.gl = gl;
         this.shaderProgram = shaderProgram;
         this.cfg = {
@@ -16,20 +18,10 @@
         this.mvMatrix = mvMatrix;
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
-        this.loadConfig(config);
+        super.loadConfig(config);
         this.webGLStart();
         
     }
-    
-    loadConfig(config) {
-        if ('undefined' !== typeof config) {
-            for (let i in config) {
-                if ('undefined' !== typeof config[i]) {
-                    this.cfg[i] = config[i];
-                }
-            }
-        }    
-    } 
 
     webGLStart() {
         this.initBuffers(this.cfg.width / 2, this.cfg.height);

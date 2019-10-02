@@ -1,9 +1,8 @@
-class CoordinatePlaneText {
+'use strict';
+class CoordinatePlaneText extends ClassHelper {
 
     constructor(gl, shaderProgram, mvMatrix, config, textConfig) {
-        //let coordinatePlane = super(gl, shaderProgram, mvMatrix, config);
-        //console.log(coordinatePlane);
-        //this.coordinatePlane = coordinatePlane;
+        super();
         this.gl = gl;
         this.shaderProgram = shaderProgram;
         this.cfg = {
@@ -19,11 +18,18 @@ class CoordinatePlaneText {
             xRotation: 0,
             yRotation: 0,
             zRotation: 0,
-            textWidth: 0.3,
-            textHeight: 0.3
+            text: {
+                      text: '',            
+                      size: 24,
+                      font: 'Georgia',
+                      color: '#000000',            
+                      width: 0.3,
+                      height: 0.3
+            },
+            textPosition: 'x'
         };
         this.mvMatrix = mvMatrix;
-        this.loadConfig(config);
+        super.loadConfig(config);
         this.webGLStart();
     }
 
@@ -74,26 +80,37 @@ class CoordinatePlaneText {
     getzRotation() {
         return this.cfg.zRotation;
     }    
+
+    getText() {
+        return this.cfg.text.text;
+    }
+    
+    getTextSize() {
+        return this.cfg.text.size;
+    }
+    
+    getTextFont() {
+        return this.cfg.text.font;
+    }        
+    
+    getTextColor() {
+        return this.cfg.text.color;
+    }
     
     getTextWidth() {
-        return this.cfg.textWidth;
+        return this.cfg.text.width;
     } 
 
     getTextHeight() {
-        return this.cfg.textHeight;
-    }             
-       
-    loadConfig(config) {
-        if ('undefined' !== typeof config) {
-            for (let i in config) {
-                if ('undefined' !== typeof config[i]) {
-                    this.cfg[i] = config[i];
-                }
-            }
-        }    
-    }     
+        return this.cfg.text.height;
+    }
+    
+    getTextPosition() {
+        return this.cfg.textPosition;
+    }                  
 
-    webGLStart() { 
+    webGLStart() {
+        let xTexture, yTexture; 
         let x = this.getX();
         let y = this.getY();
         let z = this.getZ();        
@@ -102,18 +119,31 @@ class CoordinatePlaneText {
         let xTicksCount = this.getxTicksCount();
         let yTicksCount = this.getyTicksCount();
         let ledge = this.getLedge();
-        let xlp = width / xTicksCount;
+        let xlp = width / (xTicksCount - 1);
         let ylp = height / (yTicksCount - 1);
         let rotate = this.getRotate();
         let xRotation = this.getxRotation();
         let yRotation = this.getyRotation();
         let zRotation = this.getzRotation();
         let textWidth = this.getTextWidth();
-        let textHeight = this.getTextHeight();        
+        let textHeight = this.getTextHeight();
+        let textSize = this.getTextSize();
+        let textFont = this.getTextFont();
+        let textColor = this.getTextColor(); 
+        let posX = 0;
+        let posY = 0;
+        if (this.getTextPosition() == 'x') {
+            posX = 1;
+        } else {
+            posY = 1;
+        }
+       
         mat4.rotate(this.mvMatrix, rotate, [xRotation, yRotation, zRotation]);
         const axisY = new CoordinatePlane(this.gl, this.shaderProgram, this.mvMatrix, {x: x, y: y, z: z, width: width, height: height, xTicksCount: xTicksCount, yTicksCount: yTicksCount, ledge: ledge});        
-        for (let i = 0; i < yTicksCount; i++) {
-            const bar11 = new Character(this.gl, this.shaderProgram, this.mvMatrix, {x: x + width + ledge, y: y + i * ylp - textHeight / 2, z: z, width: textWidth, height: textHeight, text: 'x' + i, textSize: 24});
+        for (let i = 0; i < posX * yTicksCount + posY * xTicksCount; i++) {
+            xTexture = posX * (x + width + ledge) + posY * (x + i * xlp - textWidth / 2);
+            yTexture = posX * (y + i * ylp - textHeight / 2) + posY * (y + height + ledge);            
+            const char = new Character(this.gl, this.shaderProgram, this.mvMatrix, {x: xTexture, y: yTexture, z: z, text: {text: 'x' + i, size: textSize, font: textFont, color: textColor, width: textWidth, height: textHeight}});
         }        
     }
 

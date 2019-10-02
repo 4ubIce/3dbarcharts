@@ -1,18 +1,22 @@
-class Character {
+'use strict';
+class Character extends ClassHelper {
 
     constructor(gl, shaderProgram, mvMatrix, config) {
+        super();
         this.gl = gl;
         this.shaderProgram = shaderProgram;
         this.cfg = {
             x: 0,
             y: 0,
             z: 0,
-            height: 1,
-            width: 1,
-            text: '',            
-            textSize: 11,
-            textFont: 'Georgia',
-            textColor: '#000000',            
+            text: {
+                      text: '',            
+                      size: 24,
+                      font: 'Georgia',
+                      color: '#000000',            
+                      width: 0.3,
+                      height: 0.3
+            },            
             rotate: 0,
             xRotation: 0,
             yRotation: 0            
@@ -21,7 +25,7 @@ class Character {
         this.mvMatrix = mvMatrix;
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
-        this.loadConfig(config);
+        super.loadConfig(config);
         this.webGLStart();
     }
     
@@ -38,27 +42,27 @@ class Character {
     }
 
     getHeight() {
-        return this.cfg.height;
+        return this.cfg.text.height;
     }
     
     getWidth() {
-        return this.cfg.width;
+        return this.cfg.text.width;
     }
     
     getText() {
-        return this.cfg.text;
+        return this.cfg.text.text;
     }
     
     getTextSize() {
-        return this.cfg.textSize;
+        return this.cfg.text.size;
     }
     
     getTextFont() {
-        return this.cfg.textFont;
+        return this.cfg.text.font;
     }        
     
     getTextColor() {
-        return this.cfg.textColor;
+        return this.cfg.text.color;
     }        
     
     getRotate() {
@@ -72,16 +76,6 @@ class Character {
     getyRotation() {
         return this.cfg.yRotation;
     }           
-    
-    loadConfig(config) {
-        if ('undefined' !== typeof config) {
-            for (let i in config) {
-                if ('undefined' !== typeof config[i]) {
-                    this.cfg[i] = config[i];
-                }
-            }
-        }    
-    } 
 
     webGLStart() {
         this.initTextCanvas();
