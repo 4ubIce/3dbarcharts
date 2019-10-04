@@ -158,6 +158,13 @@ class Character extends ClassHelper {
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);
         this.squareVertexColorBuffer.itemSize = 4;
         this.squareVertexColorBuffer.numItems = 1;
+        
+        this.lineVertexIndexBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.lineVertexIndexBuffer);
+        let lineVertexIndices = [0,1,2,3];
+        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(lineVertexIndices), this.gl.STATIC_DRAW);
+        this.lineVertexIndexBuffer.itemSize = 1;
+        this.lineVertexIndexBuffer.numItems = 4;                 
     }
 
     drawScene() { 
@@ -181,9 +188,13 @@ class Character extends ClassHelper {
         this.gl.uniform4fv(this.shaderProgram.vColor1, whiteColor);
         this.gl.uniform4fv(this.shaderProgram.vColor2, blackColor);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.textTexture);
-        this.gl.uniform1i(this.shaderProgram.samplerUniform, 0);  
+        this.gl.uniform1i(this.shaderProgram.samplerUniform, 0);                     
+        
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.lineVertexIndexBuffer);
+          
         this.setMatrixUniforms();  
-        this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, this.squareVertexPositionBuffer.numItems);
+        //this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, this.squareVertexPositionBuffer.numItems);
+        this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.lineVertexIndexBuffer.numItems, this.gl.UNSIGNED_SHORT, 0);
     }
 
     setMatrixUniforms() {

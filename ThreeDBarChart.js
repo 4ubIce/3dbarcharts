@@ -139,7 +139,7 @@ class ThreeDBarChart extends ClassHelper {
             };
             
             this.mvPushMatrix();     
-            const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: 0, z: 1, width: w, height: d, xTicksCount: maxColumnCount, yTicksCount: rowCount, tickStep: tickStep, ledge: l, rotate: 90, xRotation: 1, text: this.cfg.text, textPosition: 'y'});
+            const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: 0, z: 1, width: w, height: d, xTicksCount: maxColumnCount, yTicksCount: rowCount, tickStep: d / (rowCount - 1), ledge: l, rotate: 90, xRotation: 1, text: this.cfg.text, textPosition: 'y'});
             this.mvPopMatrix();            
             this.mvPushMatrix();     
             const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue), xTicksCount: maxColumnCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, text: {text: axisValue}});
