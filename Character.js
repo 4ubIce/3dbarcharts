@@ -152,12 +152,12 @@ class Character extends ClassHelper {
         this.squareVertexTextureCoordBuffer.itemSize = 2;
         this.squareVertexTextureCoordBuffer.numItems = 4;
         
-        this.cubeVertexColorBuffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexColorBuffer);
+        this.squareVertexColorBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexColorBuffer);
         let colors = [0.0, 0.0, 0.0, 0.0];
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);
-        this.cubeVertexColorBuffer.itemSize = 4;
-        this.cubeVertexColorBuffer.numItems = 1;        
+        this.squareVertexColorBuffer.itemSize = 4;
+        this.squareVertexColorBuffer.numItems = 1;
     }
 
     drawScene() { 
@@ -175,8 +175,8 @@ class Character extends ClassHelper {
         this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.squareVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexTextureCoordBuffer);
         this.gl.vertexAttribPointer(this.shaderProgram.textureCoordAttribute, this.squareVertexTextureCoordBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexColorBuffer);
-        this.gl.vertexAttribPointer(this.shaderProgram.vertexColorAttribute, this.cubeVertexColorBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexColorBuffer);
+        this.gl.vertexAttribPointer(this.shaderProgram.vertexColorAttribute, this.squareVertexColorBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.uniform4fv(this.shaderProgram.vColor1, whiteColor);
         this.gl.uniform4fv(this.shaderProgram.vColor2, blackColor);

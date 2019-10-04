@@ -12,9 +12,9 @@ class ThreeDBarChart extends ClassHelper {
             depth: 1,
             ledge: 0,
             animationSpeed: -0.02,
-            axisTicksCount: 4,
+            axisTicksCount: 5,
             text: {
-                      text: '',            
+                      text: [],            
                       size: 24,
                       font: 'Georgia',
                       color: '#000000',            
@@ -114,11 +114,6 @@ class ThreeDBarChart extends ClassHelper {
         
         let data = this.data;
         let rowCount = data.length;
-        let xLength;
-        let yLength = 1;
-        let zLength = 1;
-        let xBarPadding;
-        let zBarPadding;
         let w = this.getWidth();
         let h = this.getHeight();
         let d = this.getDepth();
@@ -128,7 +123,9 @@ class ThreeDBarChart extends ClassHelper {
         let maxColumnCount = d3.max(data, function(row) {return row.length});
         const yScale = d3.scaleLinear()
                        .domain([0, maxValue])
-                       .range([-1, h]);        
+                       .range([-1, h]);
+        let axisValue = d3.ticks(0, maxValue, axisTicksCount);
+        let tickStep = 1 + yScale(d3.tickStep(0, maxValue, axisTicksCount));
 
         if (this.gl) {
             mat4.rotate(this.mvMatrix, this.animationSpeed, [this.xRotation, 0, this.zRotation]);
@@ -142,14 +139,15 @@ class ThreeDBarChart extends ClassHelper {
             };
             
             this.mvPushMatrix();     
-            const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: 0, z: 1, width: w, height: d, xTicksCount: maxColumnCount, yTicksCount: rowCount, ledge: l, rotate: 90, xRotation: 1, text: this.cfg.text, textPosition: 'y'});
+            const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: 0, z: 1, width: w, height: d, xTicksCount: maxColumnCount, yTicksCount: rowCount, tickStep: tickStep, ledge: l, rotate: 90, xRotation: 1, text: this.cfg.text, textPosition: 'y'});
             this.mvPopMatrix();            
             this.mvPushMatrix();     
-            const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue), xTicksCount: maxColumnCount, yTicksCount: axisTicksCount, ledge: l, text: this.cfg.text});
+            const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue), xTicksCount: maxColumnCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, text: {text: axisValue}});
             this.mvPopMatrix();
             this.mvPushMatrix();     
-            const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -d + 1, y: -1, z: w / 2 + l, width: d, height: 1 + yScale(maxValue), xTicksCount: rowCount, yTicksCount: axisTicksCount, ledge: l, rotate: -90, yRotation: 1, text: this.cfg.text, textPosition: 'y'});
-            this.mvPopMatrix();            
+            const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -d + 1, y: -1, z: w / 2 + l, width: d, height: 1 + yScale(maxValue), xTicksCount: rowCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1, text: this.cfg.text, textPosition: 'y'});
+            this.mvPopMatrix();
+                        
         }                        
     }
     
@@ -291,5 +289,5 @@ class ThreeDBarChart extends ClassHelper {
         this.yRotation = 0;
         this.zRotation = 0;
         this.animationOn = 0;
-    }               
+    }
 }

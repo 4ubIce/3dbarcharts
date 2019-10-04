@@ -13,6 +13,7 @@ class CoordinatePlane extends ClassHelper {
             width: 1,
             xTicksCount: 5,
             yTicksCount: 3,
+            tickStep: 0.2,
             ledge: 0.0,
             rotate: 0,
             xRotation: 0,
@@ -52,6 +53,10 @@ class CoordinatePlane extends ClassHelper {
     getyTicksCount() {
         return this.cfg.yTicksCount;
     }   
+
+    getTickStep() {
+        return this.cfg.tickStep;
+    }
      
     getyLedge() {
         return this.cfg.ledge;
@@ -84,32 +89,45 @@ class CoordinatePlane extends ClassHelper {
         let xTicksCount = this.getxTicksCount();
         let yTicksCount = this.getyTicksCount();
         let ledge = this.getyLedge();
-        let xLinePadding = width / (xTicksCount - 1);
-        let yLinePadding = height / (yTicksCount - 1);
+        let xlp = width / (xTicksCount - 1);
+//        let ylp = height / (yTicksCount - 1);
+        let ylp = this.getTickStep();
   
         this.cubeVertexPositionBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexPositionBuffer);
         let vertices = [];
         for (let i = 0; i < yTicksCount; i++) {
-           vertices = vertices.concat([x - ledge,         y + i * yLinePadding, z,
-                                       x + width + ledge, y + i * yLinePadding, z]);
+           vertices = vertices.concat([x - ledge,         y + i * ylp, z,
+                                       x + width + ledge, y + i * ylp, z]);
         }
         
         for (let i = 0; i < xTicksCount; i++) {
-           vertices = vertices.concat([x + i * xLinePadding, y - ledge,          z,
-                                       x + i * xLinePadding, y + height + ledge, z]);
+           vertices = vertices.concat([x + i * xlp, y - ledge,          z,
+                                       x + i * xlp, y + height + ledge, z]);
         }        
-      
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
         this.cubeVertexPositionBuffer.itemSize = 3;
         this.cubeVertexPositionBuffer.numItems = 2 * (xTicksCount + yTicksCount);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
 
         this.cubeVertexColorBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexColorBuffer);
-        let color = 0;
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(color), this.gl.STATIC_DRAW);
-        this.cubeVertexColorBuffer.itemSize = 1;
-        this.cubeVertexColorBuffer.numItems = 1;
+        this.cubeVertexColorBuffer.itemSize = 4;
+        this.cubeVertexColorBuffer.numItems = 2 * (xTicksCount + yTicksCount);
+        let colors = []
+        for (let i = 0; i < 2 * (xTicksCount + yTicksCount); i++) {
+            colors = colors.concat([0.0, 0.0, 0.0, 1.0]);
+        }        
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);
+
+        this.lineVertexIndexBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.lineVertexIndexBuffer);
+        let lineVertexIndices = [];
+        for (let i = 0; i < 2 * (xTicksCount + yTicksCount); i = i + 2) {
+            lineVertexIndices = lineVertexIndices.concat([i, i + 1]);
+        }
+        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(lineVertexIndices), this.gl.STATIC_DRAW);
+        this.lineVertexIndexBuffer.itemSize = 1;
+        this.lineVertexIndexBuffer.numItems = 2 * (xTicksCount + yTicksCount); 
     }
 
     drawScene() { 
@@ -124,8 +142,12 @@ class CoordinatePlane extends ClassHelper {
         this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.cubeVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexColorBuffer);
         this.gl.vertexAttribPointer(this.shaderProgram.vertexColorAttribute, this.cubeVertexColorBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
+        
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.lineVertexIndexBuffer);
+        
         this.setMatrixUniforms();
-        this.gl.drawArrays(this.gl.LINES, 0, this.cubeVertexPositionBuffer.numItems);
+        //this.gl.drawArrays(this.gl.LINES, 0, this.cubeVertexPositionBuffer.numItems);
+        this.gl.drawElements(this.gl.LINES, this.lineVertexIndexBuffer.numItems, this.gl.UNSIGNED_SHORT, 0);
     }
 
     setMatrixUniforms() {

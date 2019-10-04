@@ -3,7 +3,7 @@ class ClassHelper {
     loadConfig(config, link) {
         if ('undefined' !== typeof config) {
             for (let i in config) {
-                if ('object' == typeof config[i]) {
+                if (('object' === typeof config[i]) && (!Array.isArray(config[i]))) {
                     this.loadConfig(config[i], i);
                 } else if ('undefined' !== typeof config[i]) {
                     if ('undefined' !== typeof link) {
