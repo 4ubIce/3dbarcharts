@@ -1,24 +1,28 @@
 [
-  [
-    {"Params": "x1", "Value": 12},
-    {"Params": "x2", "Value": 12},
-    {"Params": "x3", "Value": 54},
-    {"Params": "x4", "Value": 2},
-    {"Params": "x5", "Value": 44},
-    {"Params": "x6", "Value": 34},
-    {"Params": "x7", "Value": 37},
-    {"Params": "x8", "Value": 27},
-    {"Params": "x9", "Value": 45}
-  ],
-  [
-    {"Params": "x1", "Value": 5},
-    {"Params": "x2", "Value": 22},
-    {"Params": "x3", "Value": 55},
-    {"Params": "x4", "Value": 21},
-    {"Params": "x5", "Value": 32},
-    {"Params": "x6", "Value": 5},
-    {"Params": "x7", "Value": 58},
-    {"Params": "x8", "Value": 34},
-    {"Params": "x9", "Value": 15}
-  ]   
+  {"2020":
+    [
+      {"Params": "x1", "Value": 12},
+      {"Params": "x2", "Value": 12},
+      {"Params": "x3", "Value": 54},
+      {"Params": "x4", "Value": 2},
+      {"Params": "x5", "Value": 44},
+      {"Params": "x6", "Value": 34},
+      {"Params": "x7", "Value": 37},
+      {"Params": "x8", "Value": 27},
+      {"Params": "x9", "Value": 45}
+    ]
+  },
+  {"2021":
+    [
+      {"Params": "x1", "Value": 5},
+      {"Params": "x2", "Value": 22},
+      {"Params": "x3", "Value": 55},
+      {"Params": "x4", "Value": 21},
+      {"Params": "x5", "Value": 32},
+      {"Params": "x6", "Value": 5},
+      {"Params": "x7", "Value": 58},
+      {"Params": "x8", "Value": 34},
+      {"Params": "x9", "Value": 15}
+    ]
+  }   
 ]

@@ -25,11 +25,15 @@ class CoordinatePlaneText extends ClassHelper {
                       font: 'Georgia',
                       color: '#000000',            
                       width: 0.3,
-                      height: 0.3
-            },
-            textPosition: 'x'
+                      height: 0.3,
+                      rotate: 0,
+                      xRotation: 0,
+                      yRotation: 0,
+                      position: 'x'                      
+            }
         };
         this.mvMatrix = mvMatrix;
+        this.mvMatrixStack = [];
         super.loadConfig(config);
         this.webGLStart();
     }
@@ -110,12 +114,24 @@ class CoordinatePlaneText extends ClassHelper {
         return this.cfg.text.height;
     }
     
+    getTextRotate() {
+        return this.cfg.text.rotate;
+    }
+    
+    getTextxRotation() {
+        return this.cfg.text.xRotation;
+    }
+    
+    getTextyRotation() {
+        return this.cfg.text.yRotation;
+    }            
+    
     getTextPosition() {
-        return this.cfg.textPosition;
+        return this.cfg.text.position;
     }                  
 
     webGLStart() {
-        let xTexture, yTexture; 
+        let xTexture, yTexture, zTexture; 
         let x = this.getX();
         let y = this.getY();
         let z = this.getZ();        
@@ -136,7 +152,10 @@ class CoordinatePlaneText extends ClassHelper {
         let textHeight = this.getTextHeight();
         let textSize = this.getTextSize();
         let textFont = this.getTextFont();
-        let textColor = this.getTextColor(); 
+        let textColor = this.getTextColor();
+        let textRotate = this.getTextRotate();
+        let textxRotation = this.getTextxRotation();
+        let textyRotation = this.getTextyRotation();
         let posX = 0;
         let posY = 0;
         if (this.getTextPosition() == 'x') {
@@ -149,8 +168,11 @@ class CoordinatePlaneText extends ClassHelper {
         const axisY = new CoordinatePlane(this.gl, this.shaderProgram, this.mvMatrix, {x: x, y: y, z: z, width: width, height: height, xTicksCount: xTicksCount, yTicksCount: yTicksCount, tickStep: ylp, ledge: ledge});        
         for (let i = 0; i < posX * yTicksCount + posY * xTicksCount; i++) {
             xTexture = posX * (x + width + ledge) + posY * (x + i * xlp - textWidth / 2);
-            yTexture = posX * (y + i * ylp - textHeight / 2) + posY * (y + height + ledge);            
-            const char = new Character(this.gl, this.shaderProgram, this.mvMatrix, {x: xTexture, y: yTexture, z: z, text: {text: t[i], size: textSize, font: textFont, color: textColor, width: textWidth, height: textHeight}});
+            yTexture = posX * (y + i * ylp - textHeight / 2) - posY * (y + height + ylp);
+            zTexture = posX * z + posY * (z - height - 1);            
+            this.mvPushMatrix();
+            const char = new Character(this.gl, this.shaderProgram, this.mvMatrix, {x: xTexture, y: yTexture, z: zTexture, text: {text: t[i], size: textSize, font: textFont, color: textColor, width: textWidth, height: textHeight}, rotate: textRotate, xRotation: textxRotation, yRotation: textyRotation});
+            this.mvPopMatrix();
         }        
     }
 
@@ -160,7 +182,20 @@ class CoordinatePlaneText extends ClassHelper {
 
     degToRad(degrees) {
         return degrees * Math.PI / 180;
-    }   
+    }
+    
+    mvPushMatrix() {
+        let copy = mat4.create();
+        mat4.set(this.mvMatrix, copy);
+        this.mvMatrixStack.push(copy);
+    }
+
+    mvPopMatrix() {
+        if (this.mvMatrixStack.length == 0) {
+          throw "Invalid popMatrix!";
+        }
+        this.mvMatrix = this.mvMatrixStack.pop();
+    }        
 }
 
 

@@ -25,8 +25,10 @@ class Character extends ClassHelper {
         this.mvMatrix = mvMatrix;
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
+        //this.mvPushMatrix(); 
         super.loadConfig(config);
         this.webGLStart();
+        //this.mvPopMatrix();
     }
     
     getX() {
@@ -176,8 +178,9 @@ class Character extends ClassHelper {
         let blackColor = new Float32Array([0, 0, 0, 1]);
         
         mat4.perspective(45, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
+                
         mat4.rotate(this.mvMatrix, rotate, [xRotation, yRotation, 0]);
-        
+
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexPositionBuffer);
         this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.squareVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexTextureCoordBuffer);
@@ -192,9 +195,11 @@ class Character extends ClassHelper {
         
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.lineVertexIndexBuffer);
           
-        this.setMatrixUniforms();  
+        this.setMatrixUniforms();
+  
         //this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, this.squareVertexPositionBuffer.numItems);
         this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.lineVertexIndexBuffer.numItems, this.gl.UNSIGNED_SHORT, 0);
+
     }
 
     setMatrixUniforms() {
@@ -213,6 +218,19 @@ class Character extends ClassHelper {
         }
         return pow;
     }
+    
+    mvPushMatrix() {
+        let copy = mat4.create();
+        mat4.set(this.mvMatrix, copy);
+        this.mvMatrixStack.push(copy);
+    }
+
+    mvPopMatrix() {
+        if (this.mvMatrixStack.length == 0) {
+          throw "Invalid popMatrix!";
+        }
+        this.mvMatrix = this.mvMatrixStack.pop();
+    }    
 }
 
 

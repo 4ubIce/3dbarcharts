@@ -117,35 +117,49 @@ class ThreeDBarChart extends ClassHelper {
         let w = this.getWidth();
         let h = this.getHeight();
         let d = this.getDepth();
-        let l = this.getLedge();        
+        let l = this.getLedge();
         let axisTicksCount = this.getaxisTicksCount();        
-        let maxValue = d3.max(data, function(row) {return d3.max(row, function(val) {return val.Value})});
-        let maxColumnCount = d3.max(data, function(row) {return row.length});
+        //let maxValue = d3.max(data, function(row) {return d3.max(d3.values(d3.values(row)), function(val) {return val.Value})});
+        let maxValue = d3.max(data, function(row) {return d3.max(d3.values(row)[0], function(val) {return val.Value})});
+        //let maxColumnCount = d3.max(data, function(row) {return row.length});
+        let maxColumnCount = d3.max(data, function(row) {return d3.values(d3.values(row)[0]).length});
+
         const yScale = d3.scaleLinear()
                        .domain([0, maxValue])
                        .range([-1, h]);
-        let axisValue = d3.ticks(0, maxValue, axisTicksCount);
-        let tickStep = 1 + yScale(d3.tickStep(0, maxValue, axisTicksCount));
 
+        let axisYValue = d3.ticks(0, maxValue, axisTicksCount);
+        let tickStep = 1 + yScale(d3.tickStep(0, maxValue, axisTicksCount));
+        
+        let axisXValue = [];
+        for (let i = 0; i < d3.values(data[0])[0].length; i++) {
+            axisXValue = axisXValue.concat(d3.values(data[0])[0][i].Params);
+        }
+
+        let axisZValue = [];
+        for (let i = 0; i < data.length; i++) {
+            axisZValue = axisZValue.concat(d3.keys(data[i]));
+        }
+                
         if (this.gl) {
             mat4.rotate(this.mvMatrix, this.animationSpeed, [this.xRotation, 0, this.zRotation]);
-            for (let i = 0; i < data.length; i++) {    
-                for (let j = 0; j < data[i].length; j++) {
+            for (let i = 0; i < data.length; i++) {
+                for (let j = 0; j < d3.values(data[i])[0].length; j++) {
                     this.mvPushMatrix();
                     mat4.translate(this.mvMatrix, [-w / 2 + j * w / (maxColumnCount - 1), 0.0, i * d / (rowCount - 1)]);
-                    const bar1 = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(data[i][j].Value)});
+                    const bar1 = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(d3.values(data[i])[0][j].Value)});
                     this.mvPopMatrix();
                 };
             };
             
             this.mvPushMatrix();     
-            const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: 0, z: 1, width: w, height: d, xTicksCount: maxColumnCount, yTicksCount: rowCount, tickStep: d / (rowCount - 1), ledge: l, rotate: 90, xRotation: 1, text: this.cfg.text, textPosition: 'y'});
+            const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: 0, z: 1, width: w, height: d, xTicksCount: maxColumnCount, yTicksCount: rowCount, tickStep: d / (rowCount - 1), ledge: l, rotate: 90, xRotation: 1, text: {text: axisXValue, position: 'y', rotate: 180, xRotation: 1}});
             this.mvPopMatrix();            
             this.mvPushMatrix();     
-            const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue), xTicksCount: maxColumnCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, text: {text: axisValue}});
+            const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue), xTicksCount: maxColumnCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, text: {text: axisYValue}});
             this.mvPopMatrix();
             this.mvPushMatrix();     
-            const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -d + 1, y: -1, z: w / 2 + l, width: d, height: 1 + yScale(maxValue), xTicksCount: rowCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1, text: this.cfg.text, textPosition: 'y'});
+            const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -d + 1, y: -1, z: w / 2 + l, width: d, height: 1 + yScale(maxValue), xTicksCount: rowCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1, text: {text: axisZValue, position: 'y', rotate: 180, xRotation: 1}});
             this.mvPopMatrix();
                         
         }                        
