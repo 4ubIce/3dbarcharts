@@ -23,6 +23,8 @@ class ThreeDBarChart extends ClassHelper {
             }            
         };
         this.gl = this.initGL(this.element);
+        this.barArray = [];
+        this.axisArray = [];
         this.animationOn = 0;
         this.lastTime = 0;
         this.mvMatrix = mat4.create();
@@ -147,19 +149,27 @@ class ThreeDBarChart extends ClassHelper {
                 for (let j = 0; j < d3.values(data[i])[0].length; j++) {
                     this.mvPushMatrix();
                     mat4.translate(this.mvMatrix, [-w / 2 + j * w / (maxColumnCount - 1), 0.0, i * d / (rowCount - 1)]);
-                    const bar1 = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(d3.values(data[i])[0][j].Value)});
+                    let bar = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(d3.values(data[i])[0][j].Value)});
+                    bar.draw();
+                    this.barArray.push(bar);
                     this.mvPopMatrix();
                 };
             };
             
-            this.mvPushMatrix();     
+            this.mvPushMatrix();
             const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: 0, z: 1, width: w, height: d, xTicksCount: maxColumnCount, yTicksCount: rowCount, tickStep: d / (rowCount - 1), ledge: l, rotate: 90, xRotation: 1, text: {text: axisXValue, position: 'y', rotate: 180, xRotation: 1}});
+            axisX.draw();
+            this.axisArray.push(axisX);     
             this.mvPopMatrix();            
-            this.mvPushMatrix();     
-            const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue), xTicksCount: maxColumnCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, text: {text: axisYValue}});
+            this.mvPushMatrix();
+            const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue), xTicksCount: maxColumnCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, text: {text: axisYValue}});     
+            axisY.draw();
+            this.axisArray.push(axisY);
             this.mvPopMatrix();
-            this.mvPushMatrix();     
-            const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -d + 1, y: -1, z: w / 2 + l, width: d, height: 1 + yScale(maxValue), xTicksCount: rowCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1, text: {text: axisZValue, position: 'y', rotate: 180, xRotation: 1}});
+            this.mvPushMatrix();
+            const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -d + 1, y: -1, z: w / 2 + l, width: d, height: 1 + yScale(maxValue), xTicksCount: rowCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1, text: {text: axisZValue, position: 'y', rotate: -180, yRotation: 1}});     
+            axisZ.draw();
+            this.axisArray.push(axisZ);
             this.mvPopMatrix();
                         
         }                        

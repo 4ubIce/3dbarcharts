@@ -19,11 +19,11 @@ class ThreeDBar extends ClassHelper {
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
         super.loadConfig(config);
-        this.webGLStart();
+        //this.draw();
         
     }
 
-    webGLStart() {
+    draw() {
         this.initBuffers(this.cfg.width / 2, this.cfg.height);
         this.initTexture();
         this.drawScene();

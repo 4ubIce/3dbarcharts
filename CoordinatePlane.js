@@ -23,7 +23,7 @@ class CoordinatePlane extends ClassHelper {
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
         super.loadConfig(config);
-        this.webGLStart();
+        this.draw();
     }
     
     getX() {
@@ -74,7 +74,7 @@ class CoordinatePlane extends ClassHelper {
         return this.cfg.yRotation;
     }           
 
-    webGLStart() {
+    draw() {
         this.initBuffers();
         this.drawScene();
     }

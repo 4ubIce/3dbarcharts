@@ -32,10 +32,12 @@ class CoordinatePlaneText extends ClassHelper {
                       position: 'x'                      
             }
         };
+        this.axis;
+        this.chars = [];
         this.mvMatrix = mvMatrix;
         this.mvMatrixStack = [];
         super.loadConfig(config);
-        this.webGLStart();
+        //this.draw();
     }
 
     getX() {
@@ -130,7 +132,7 @@ class CoordinatePlaneText extends ClassHelper {
         return this.cfg.text.position;
     }                  
 
-    webGLStart() {
+    draw() {
         let xTexture, yTexture, zTexture; 
         let x = this.getX();
         let y = this.getY();
@@ -163,15 +165,19 @@ class CoordinatePlaneText extends ClassHelper {
         } else {
             posY = 1;
         }
-       
+        
         mat4.rotate(this.mvMatrix, rotate, [xRotation, yRotation, zRotation]);
-        const axisY = new CoordinatePlane(this.gl, this.shaderProgram, this.mvMatrix, {x: x, y: y, z: z, width: width, height: height, xTicksCount: xTicksCount, yTicksCount: yTicksCount, tickStep: ylp, ledge: ledge});        
+        this.axis = new CoordinatePlane(this.gl, this.shaderProgram, this.mvMatrix, {x: x, y: y, z: z, width: width, height: height, xTicksCount: xTicksCount, yTicksCount: yTicksCount, tickStep: ylp, ledge: ledge});
+        this.axis.draw();
+        console.log(height);        
         for (let i = 0; i < posX * yTicksCount + posY * xTicksCount; i++) {
-            xTexture = posX * (x + width + ledge) + posY * (x + i * xlp - textWidth / 2);
-            yTexture = posX * (y + i * ylp - textHeight / 2) - posY * (y + height + ylp);
-            zTexture = posX * z + posY * (z - height - 1);            
+            xTexture = posX * (x + width + ledge) + posY * (x + i * xlp - textWidth / 2);//-1
+            yTexture = posX * (y + i * ylp - textHeight / 2) - posY * (y + height + ledge + textHeight);//-2.7=height + ledge + textHeight + ledge
+            zTexture = posX * z + posY * (z - height - 1);//-1.4            
             this.mvPushMatrix();
-            const char = new Character(this.gl, this.shaderProgram, this.mvMatrix, {x: xTexture, y: yTexture, z: zTexture, text: {text: t[i], size: textSize, font: textFont, color: textColor, width: textWidth, height: textHeight}, rotate: textRotate, xRotation: textxRotation, yRotation: textyRotation});
+            let char = new Character(this.gl, this.shaderProgram, this.mvMatrix, {x: xTexture, y: yTexture, z: zTexture, text: {text: t[i], size: textSize, font: textFont, color: textColor, width: textWidth, height: textHeight}, rotate: textRotate, xRotation: textxRotation, yRotation: textyRotation});
+            char.draw();
+            this.chars.push(char);
             this.mvPopMatrix();
         }        
     }

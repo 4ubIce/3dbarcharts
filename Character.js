@@ -27,7 +27,7 @@ class Character extends ClassHelper {
         this.mvMatrixStack = [];
         //this.mvPushMatrix(); 
         super.loadConfig(config);
-        this.webGLStart();
+        //this.draw();
         //this.mvPopMatrix();
     }
     
@@ -79,7 +79,7 @@ class Character extends ClassHelper {
         return this.cfg.yRotation;
     }           
 
-    webGLStart() {
+    draw() {
         this.initTextCanvas();
         this.initTexture();
         this.initBuffers();
@@ -180,7 +180,7 @@ class Character extends ClassHelper {
         mat4.perspective(45, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
                 
         mat4.rotate(this.mvMatrix, rotate, [xRotation, yRotation, 0]);
-
+        console.log(rotate);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexPositionBuffer);
         this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.squareVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexTextureCoordBuffer);
