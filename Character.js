@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 class Character extends ClassHelper {
 
     constructor(gl, shaderProgram, mvMatrix, config) {
@@ -25,10 +25,7 @@ class Character extends ClassHelper {
         this.mvMatrix = mvMatrix;
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
-        //this.mvPushMatrix(); 
         super.loadConfig(config);
-        //this.draw();
-        //this.mvPopMatrix();
     }
     
     getX() {
@@ -132,12 +129,13 @@ class Character extends ClassHelper {
 
         this.squareVertexPositionBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexPositionBuffer);
+      
         let vertices = [
-             x + width,  y + height,  z,
-             x,          y + height,  z,
-             x + width,  y,           z,
-             x,          y,           z          
-        ];
+             width,  height,  0,
+             0,      height,  0,
+             width,  0,       0,
+             0,      0,       0          
+        ];        
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
         this.squareVertexPositionBuffer.itemSize = 3;
         this.squareVertexPositionBuffer.numItems = 4;
@@ -170,7 +168,10 @@ class Character extends ClassHelper {
     }
 
     drawScene() { 
-    
+
+        let x = this.getX();
+        let y = this.getY();
+        let z = this.getZ();    
         let rotate = this.getRotate();
         let xRotation = this.getxRotation();
         let yRotation = this.getyRotation(); 
@@ -178,9 +179,9 @@ class Character extends ClassHelper {
         let blackColor = new Float32Array([0, 0, 0, 1]);
         
         mat4.perspective(45, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
-                
+        mat4.translate(this.mvMatrix, [x, y, z]);        
         mat4.rotate(this.mvMatrix, rotate, [xRotation, yRotation, 0]);
-        console.log(rotate);
+        
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexPositionBuffer);
         this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.squareVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexTextureCoordBuffer);
@@ -218,19 +219,6 @@ class Character extends ClassHelper {
         }
         return pow;
     }
-    
-    mvPushMatrix() {
-        let copy = mat4.create();
-        mat4.set(this.mvMatrix, copy);
-        this.mvMatrixStack.push(copy);
-    }
-
-    mvPopMatrix() {
-        if (this.mvMatrixStack.length == 0) {
-          throw "Invalid popMatrix!";
-        }
-        this.mvMatrix = this.mvMatrixStack.pop();
-    }    
 }
 
 

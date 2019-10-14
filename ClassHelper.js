@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 class ClassHelper {
     loadConfig(config, link) {
         if ('undefined' !== typeof config) {

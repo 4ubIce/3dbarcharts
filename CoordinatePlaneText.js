@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 class CoordinatePlaneText extends ClassHelper {
 
     constructor(gl, shaderProgram, mvMatrix, config) {
@@ -19,6 +19,7 @@ class CoordinatePlaneText extends ClassHelper {
             xRotation: 0,
             yRotation: 0,
             zRotation: 0,
+            k: 0,
             text: {
                       text: [],            
                       size: 24,
@@ -37,7 +38,6 @@ class CoordinatePlaneText extends ClassHelper {
         this.mvMatrix = mvMatrix;
         this.mvMatrixStack = [];
         super.loadConfig(config);
-        //this.draw();
     }
 
     getX() {
@@ -90,7 +90,11 @@ class CoordinatePlaneText extends ClassHelper {
     
     getzRotation() {
         return this.cfg.zRotation;
-    }    
+    }
+    
+    getK() {
+        return this.cfg.k;
+    }          
 
     getText() {
         return this.cfg.text.text;
@@ -143,12 +147,12 @@ class CoordinatePlaneText extends ClassHelper {
         let yTicksCount = this.getyTicksCount();
         let ledge = this.getLedge();
         let xlp = width / (xTicksCount - 1);
-//        let ylp = height / (yTicksCount - 1);
         let ylp = this.getTickStep();
         let rotate = this.getRotate();
         let xRotation = this.getxRotation();
         let yRotation = this.getyRotation();
         let zRotation = this.getzRotation();
+        let k = this.getK();
         let t = this.getText();
         let textWidth = this.getTextWidth();
         let textHeight = this.getTextHeight();
@@ -165,15 +169,16 @@ class CoordinatePlaneText extends ClassHelper {
         } else {
             posY = 1;
         }
-        
+
+        mat4.translate(this.mvMatrix, [x, y, z]);
         mat4.rotate(this.mvMatrix, rotate, [xRotation, yRotation, zRotation]);
-        this.axis = new CoordinatePlane(this.gl, this.shaderProgram, this.mvMatrix, {x: x, y: y, z: z, width: width, height: height, xTicksCount: xTicksCount, yTicksCount: yTicksCount, tickStep: ylp, ledge: ledge});
+        this.axis = new CoordinatePlane(this.gl, this.shaderProgram, this.mvMatrix, {x: 0, y: 0, z: 0, width: width, height: height, xTicksCount: xTicksCount, yTicksCount: yTicksCount, tickStep: ylp, ledge: ledge});
         this.axis.draw();
-        console.log(height);        
+
         for (let i = 0; i < posX * yTicksCount + posY * xTicksCount; i++) {
-            xTexture = posX * (x + width + ledge) + posY * (x + i * xlp - textWidth / 2);//-1
-            yTexture = posX * (y + i * ylp - textHeight / 2) - posY * (y + height + ledge + textHeight);//-2.7=height + ledge + textHeight + ledge
-            zTexture = posX * z + posY * (z - height - 1);//-1.4            
+            xTexture = posX * (width + ledge) + posY * (i * xlp - textWidth / 2 + k * textWidth);
+            yTexture = posX * (i * ylp - textHeight / 2) + posY * (height + ledge + textHeight - k * textWidth);
+            zTexture = 0;
             this.mvPushMatrix();
             let char = new Character(this.gl, this.shaderProgram, this.mvMatrix, {x: xTexture, y: yTexture, z: zTexture, text: {text: t[i], size: textSize, font: textFont, color: textColor, width: textWidth, height: textHeight}, rotate: textRotate, xRotation: textxRotation, yRotation: textyRotation});
             char.draw();

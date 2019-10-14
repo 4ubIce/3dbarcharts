@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 class ThreeDBarChart extends ClassHelper {
 
     constructor(element, config, file) {
@@ -157,7 +157,7 @@ class ThreeDBarChart extends ClassHelper {
             };
             
             this.mvPushMatrix();
-            const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: 0, z: 1, width: w, height: d, xTicksCount: maxColumnCount, yTicksCount: rowCount, tickStep: d / (rowCount - 1), ledge: l, rotate: 90, xRotation: 1, text: {text: axisXValue, position: 'y', rotate: 180, xRotation: 1}});
+            const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -d, z: 0, width: w, height: d, xTicksCount: maxColumnCount, yTicksCount: rowCount, tickStep: d / (rowCount - 1), ledge: l, rotate: 90, xRotation: 1, text: {text: axisXValue, position: 'y', rotate: 180, xRotation: 1}});
             axisX.draw();
             this.axisArray.push(axisX);     
             this.mvPopMatrix();            
@@ -167,10 +167,10 @@ class ThreeDBarChart extends ClassHelper {
             this.axisArray.push(axisY);
             this.mvPopMatrix();
             this.mvPushMatrix();
-            const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -d + 1, y: -1, z: w / 2 + l, width: d, height: 1 + yScale(maxValue), xTicksCount: rowCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1, text: {text: axisZValue, position: 'y', rotate: -180, yRotation: 1}});     
+            const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2 - l, y: -1, z: 0, width: d, height: 1 + yScale(maxValue), xTicksCount: rowCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1, k: 1, text: {text: axisZValue, position: 'y', rotate: -180, yRotation: 1}});     
             axisZ.draw();
             this.axisArray.push(axisZ);
-            this.mvPopMatrix();
+            this.mvPopMatrix();            
                         
         }                        
     }

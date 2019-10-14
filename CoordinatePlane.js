@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 class CoordinatePlane extends ClassHelper {
 
     constructor(gl, shaderProgram, mvMatrix, config) {
@@ -23,7 +23,6 @@ class CoordinatePlane extends ClassHelper {
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
         super.loadConfig(config);
-        this.draw();
     }
     
     getX() {
@@ -90,7 +89,6 @@ class CoordinatePlane extends ClassHelper {
         let yTicksCount = this.getyTicksCount();
         let ledge = this.getyLedge();
         let xlp = width / (xTicksCount - 1);
-//        let ylp = height / (yTicksCount - 1);
         let ylp = this.getTickStep();
   
         this.cubeVertexPositionBuffer = this.gl.createBuffer();
@@ -137,7 +135,7 @@ class CoordinatePlane extends ClassHelper {
         let yRotation = this.getyRotation(); 
         
         mat4.perspective(45, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
-        mat4.rotate(this.mvMatrix, rotate, [xRotation, yRotation, 0]);
+
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexPositionBuffer);
         this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.cubeVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexColorBuffer);

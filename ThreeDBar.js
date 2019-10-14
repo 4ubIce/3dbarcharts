@@ -19,8 +19,6 @@ class ThreeDBar extends ClassHelper {
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
         super.loadConfig(config);
-        //this.draw();
-        
     }
 
     draw() {
