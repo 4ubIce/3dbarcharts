@@ -10,9 +10,7 @@ class ThreeDBar extends ClassHelper {
             y: 0,
             width: 0.2,
             height: 1,
-            barColor: '#1f77b4',
-            lineColor: 'red',
-            margin: {top: 50, right: 50, bottom: 50, left: 50},
+            barColor: '#ff0000',
             barPadding: 0.1
         };
         this.mvMatrix = mvMatrix;
@@ -20,15 +18,21 @@ class ThreeDBar extends ClassHelper {
         this.mvMatrixStack = [];
         super.loadConfig(config);
     }
-
+    
+    getBarColor() {
+        return this.hexToRgb(this.cfg.barColor, 1);
+    }
+    
     draw() {
         this.initBuffers(this.cfg.width / 2, this.cfg.height);
         this.initTexture();
         this.drawScene();
     }
 
-    initBuffers(width, height) {
-
+    initBuffers(width, height) { 
+    
+        let barColor = this.getBarColor();
+        
         this.cubeVertexPositionBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexPositionBuffer);
         let vertices = [
@@ -71,24 +75,58 @@ class ThreeDBar extends ClassHelper {
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
         this.cubeVertexPositionBuffer.itemSize = 3;
         this.cubeVertexPositionBuffer.numItems = 24;
-        
+/*        
+        this.cubeVertexNormalBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexNormalBuffer);
+        var vertexNormals = [
+          // Front face
+           0.0,  0.0,  1.0,
+           0.0,  0.0,  1.0,
+           0.0,  0.0,  1.0,
+           0.0,  0.0,  1.0,
+
+          // Back face
+           0.0,  0.0, -1.0,
+           0.0,  0.0, -1.0,
+           0.0,  0.0, -1.0,
+           0.0,  0.0, -1.0,
+
+          // Top face
+           0.0,  1.0,  0.0,
+           0.0,  1.0,  0.0,
+           0.0,  1.0,  0.0,
+           0.0,  1.0,  0.0,
+
+          // Bottom face
+           0.0, -1.0,  0.0,
+           0.0, -1.0,  0.0,
+           0.0, -1.0,  0.0,
+           0.0, -1.0,  0.0,
+
+          // Right face
+           1.0,  0.0,  0.0,
+           1.0,  0.0,  0.0,
+           1.0,  0.0,  0.0,
+           1.0,  0.0,  0.0,
+
+          // Left face
+          -1.0,  0.0,  0.0,
+          -1.0,  0.0,  0.0,
+          -1.0,  0.0,  0.0,
+          -1.0,  0.0,  0.0,
+        ];
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertexNormals), this.gl.STATIC_DRAW);
+        this.cubeVertexNormalBuffer.itemSize = 3;
+        this.cubeVertexNormalBuffer.numItems = 24;        
+*/        
         this.cubeVertexColorBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexColorBuffer);
-        let colors = [
-          [1.0, 0.0, 0.0, 1.0],     // Front face
-          [1.0, 1.0, 0.0, 1.0],     // Back face
-          [0.0, 1.0, 0.0, 1.0],     // Top face
-          [1.0, 0.5, 0.5, 1.0],     // Bottom face
-          [1.0, 0.0, 1.0, 1.0],     // Right face
-          [0.0, 0.0, 1.0, 1.0]     // Left face
-        ];
+       
         let unpackedColors = [];
-        for (let i in colors) {
-            let color = colors[i];
-            for (let j=0; j < 4; j++) {
-               unpackedColors = unpackedColors.concat(color);
-            }
+        for (let i = 1; i <= 24; i++) {
+            unpackedColors = unpackedColors.concat(barColor);
         }
+        
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(unpackedColors), this.gl.STATIC_DRAW);
         this.cubeVertexColorBuffer.itemSize = 4;
         this.cubeVertexColorBuffer.numItems = 24;
@@ -129,19 +167,57 @@ class ThreeDBar extends ClassHelper {
         this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.cubeVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexColorBuffer);
         this.gl.vertexAttribPointer(this.shaderProgram.vertexColorAttribute, this.cubeVertexColorBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
-        
+//        this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, this.cubeVertexNormalBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
+                
         this.gl.vertexAttribPointer(this.shaderProgram.textureCoordAttribute, 1, this.gl.FLOAT, false, 0, 0);
         this.gl.uniform4fv(this.shaderProgram.vColor1, blackColor);
         this.gl.uniform4fv(this.shaderProgram.vColor2, whiteColor);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.whiteTexture);        
-        
+
+        this.gl.uniform3f(
+          this.shaderProgram.ambientColorUniform,
+          parseFloat("0.2"),
+          parseFloat("0.2"),
+          parseFloat("0.2")
+        );
+        var lightingDirection = [
+          parseFloat("0.0"),
+          parseFloat("0.0"),
+          parseFloat("-1.0")
+        ];
+        var adjustedLD = vec3.create();
+        vec3.normalize(lightingDirection, adjustedLD);
+        vec3.scale(adjustedLD, -2);
+        this.gl.uniform3fv(this.shaderProgram.lightingDirectionUniform, adjustedLD);
+
+        this.gl.uniform3f(
+          this.shaderProgram.directionalColorUniform,
+          parseFloat("0.8"),
+          parseFloat("0.8"),
+          parseFloat("0.8")
+        );
+            
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.cubeVertexIndexBuffer);
         this.setMatrixUniforms();
         this.gl.drawElements(this.gl.TRIANGLES, this.cubeVertexIndexBuffer.numItems, this.gl.UNSIGNED_SHORT, 0);
     }
 
     setMatrixUniforms() {
-       this.gl.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, this.pMatrix);
-       this.gl.uniformMatrix4fv(this.shaderProgram.mvMatrixUniform, false, this.mvMatrix);
+        let normalMatrix = mat3.create();
+
+        this.gl.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, this.pMatrix);
+        this.gl.uniformMatrix4fv(this.shaderProgram.mvMatrixUniform, false, this.mvMatrix);
+
+        mat4.toInverseMat3(this.mvMatrix, normalMatrix);
+        mat3.transpose(normalMatrix);
+        this.gl.uniformMatrix3fv(this.shaderProgram.nMatrixUniform, false, normalMatrix);       
+    }
+    
+    hexToRgb(hex, opacity) {
+       return hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
+                       ,function(m, r, g, b) {return '#' + r + r + g + g + b + b})
+                 .substring(1).match(/.{2}/g)
+                 .map(function(x) {return parseInt(x, 16)/255})
+                 .concat(opacity||1);
     }
 }

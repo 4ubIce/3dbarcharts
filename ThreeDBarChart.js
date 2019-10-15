@@ -14,7 +14,6 @@ class ThreeDBarChart extends ClassHelper {
             animationSpeed: -0.02,
             axisTicksCount: 5,
             text: {
-                      text: [],            
                       size: 24,
                       font: 'Georgia',
                       color: '#000000',            
@@ -33,8 +32,8 @@ class ThreeDBarChart extends ClassHelper {
         this.mvMatrixStack = [];
         this.xRotation = 0;
         this.zRotation = 0;
-        this.animationSpeed = this.getAnimationSpeed();
         super.loadConfig(config);
+        this.animationSpeed = this.getAnimationSpeed();
         this.init();
         this.loadDataAndDraw(file);
         this.element.onmousedown = () => {this.mouseDownEvent(event);};
@@ -71,10 +70,6 @@ class ThreeDBarChart extends ClassHelper {
         return this.cfg.axisTicksCount;
     }            
 
-    getText() {
-        return this.cfg.text.text;
-    }
-    
     getTextSize() {
         return this.cfg.text.size;
     }
@@ -97,6 +92,51 @@ class ThreeDBarChart extends ClassHelper {
     
     init() {
         this.initShaders();
+        
+        this.cubeVertexNormalBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexNormalBuffer);
+        var vertexNormals = [
+          // Front face
+           0.0,  0.0,  1.0,
+           0.0,  0.0,  1.0,
+           0.0,  0.0,  1.0,
+           0.0,  0.0,  1.0,
+
+          // Back face
+           0.0,  0.0, -1.0,
+           0.0,  0.0, -1.0,
+           0.0,  0.0, -1.0,
+           0.0,  0.0, -1.0,
+
+          // Top face
+           0.0,  1.0,  0.0,
+           0.0,  1.0,  0.0,
+           0.0,  1.0,  0.0,
+           0.0,  1.0,  0.0,
+
+          // Bottom face
+           0.0, -1.0,  0.0,
+           0.0, -1.0,  0.0,
+           0.0, -1.0,  0.0,
+           0.0, -1.0,  0.0,
+
+          // Right face
+           1.0,  0.0,  0.0,
+           1.0,  0.0,  0.0,
+           1.0,  0.0,  0.0,
+           1.0,  0.0,  0.0,
+
+          // Left face
+          -1.0,  0.0,  0.0,
+          -1.0,  0.0,  0.0,
+          -1.0,  0.0,  0.0,
+          -1.0,  0.0,  0.0,
+        ];
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertexNormals), this.gl.STATIC_DRAW);
+        this.cubeVertexNormalBuffer.itemSize = 3;
+        this.cubeVertexNormalBuffer.numItems = 24; 
+        this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, this.cubeVertexNormalBuffer.itemSize, this.gl.FLOAT, false, 0, 0);        
+        
     }
 
     loadDataAndDraw(file) {
@@ -113,17 +153,21 @@ class ThreeDBarChart extends ClassHelper {
     }    
     
     drawScene() {
-        
+    
+        let barColor;
         let data = this.data;
         let rowCount = data.length;
         let w = this.getWidth();
         let h = this.getHeight();
         let d = this.getDepth();
         let l = this.getLedge();
-        let axisTicksCount = this.getaxisTicksCount();        
-        //let maxValue = d3.max(data, function(row) {return d3.max(d3.values(d3.values(row)), function(val) {return val.Value})});
+        let axisTicksCount = this.getaxisTicksCount();
+        let ts = this.getTextSize();
+        let tc = this.getTextColor();
+        let tf = this.getTextFont();
+        let tw = this.getTextWidth();
+        let th = this.getTextHeight();         
         let maxValue = d3.max(data, function(row) {return d3.max(d3.values(row)[0], function(val) {return val.Value})});
-        //let maxColumnCount = d3.max(data, function(row) {return row.length});
         let maxColumnCount = d3.max(data, function(row) {return d3.values(d3.values(row)[0]).length});
 
         const yScale = d3.scaleLinear()
@@ -142,14 +186,15 @@ class ThreeDBarChart extends ClassHelper {
         for (let i = 0; i < data.length; i++) {
             axisZValue = axisZValue.concat(d3.keys(data[i]));
         }
-                
+                        
         if (this.gl) {
             mat4.rotate(this.mvMatrix, this.animationSpeed, [this.xRotation, 0, this.zRotation]);
             for (let i = 0; i < data.length; i++) {
+                barColor = data[i].color;
                 for (let j = 0; j < d3.values(data[i])[0].length; j++) {
                     this.mvPushMatrix();
                     mat4.translate(this.mvMatrix, [-w / 2 + j * w / (maxColumnCount - 1), 0.0, i * d / (rowCount - 1)]);
-                    let bar = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(d3.values(data[i])[0][j].Value)});
+                    let bar = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(d3.values(data[i])[0][j].Value), barColor: barColor});
                     bar.draw();
                     this.barArray.push(bar);
                     this.mvPopMatrix();
@@ -157,17 +202,17 @@ class ThreeDBarChart extends ClassHelper {
             };
             
             this.mvPushMatrix();
-            const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -d, z: 0, width: w, height: d, xTicksCount: maxColumnCount, yTicksCount: rowCount, tickStep: d / (rowCount - 1), ledge: l, rotate: 90, xRotation: 1, text: {text: axisXValue, position: 'y', rotate: 180, xRotation: 1}});
+            const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -d, z: 0, width: w, height: d, xTicksCount: maxColumnCount, yTicksCount: rowCount, tickStep: d / (rowCount - 1), ledge: l, rotate: 90, xRotation: 1, text: {text: axisXValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: 180, xRotation: 1}});
             axisX.draw();
             this.axisArray.push(axisX);     
             this.mvPopMatrix();            
             this.mvPushMatrix();
-            const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue), xTicksCount: maxColumnCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, text: {text: axisYValue}});     
+            const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue), xTicksCount: maxColumnCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, text: {text: axisYValue, size: ts, font: tf, color: tc, width: tw, height: th}});     
             axisY.draw();
             this.axisArray.push(axisY);
             this.mvPopMatrix();
             this.mvPushMatrix();
-            const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2 - l, y: -1, z: 0, width: d, height: 1 + yScale(maxValue), xTicksCount: rowCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1, k: 1, text: {text: axisZValue, position: 'y', rotate: -180, yRotation: 1}});     
+            const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2 - l, y: -1, z: 0, width: d, height: 1 + yScale(maxValue), xTicksCount: rowCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1, text: {text: axisZValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: -180, yRotation: 1, offset: this.getTextWidth()}});     
             axisZ.draw();
             this.axisArray.push(axisZ);
             this.mvPopMatrix();            
@@ -212,14 +257,21 @@ class ThreeDBarChart extends ClassHelper {
         this.gl.enableVertexAttribArray(this.shaderProgram.vertexPositionAttribute);
         this.shaderProgram.vertexColorAttribute = this.gl.getAttribLocation(this.shaderProgram, "aVertexColor");
         this.gl.enableVertexAttribArray(this.shaderProgram.vertexColorAttribute);
+        this.shaderProgram.vertexNormalAttribute = this.gl.getAttribLocation(this.shaderProgram, "aVertexNormal");
+        this.gl.enableVertexAttribArray(this.shaderProgram.vertexNormalAttribute);         
         this.shaderProgram.textureCoordAttribute = this.gl.getAttribLocation(this.shaderProgram, "aTextureCoord");
         this.gl.enableVertexAttribArray(this.shaderProgram.textureCoordAttribute);        
         
         this.shaderProgram.pMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uPMatrix");
         this.shaderProgram.mvMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uMVMatrix");
+        this.shaderProgram.nMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uNMatrix");
         this.shaderProgram.samplerUniform = this.gl.getUniformLocation(this.shaderProgram, "uSampler");
         this.shaderProgram.vColor1 = this.gl.getUniformLocation(this.shaderProgram, "vColor1");
-        this.shaderProgram.vColor2 = this.gl.getUniformLocation(this.shaderProgram, "vColor2");        
+        this.shaderProgram.vColor2 = this.gl.getUniformLocation(this.shaderProgram, "vColor2");
+        this.shaderProgram.useLightingUniform = this.gl.getUniformLocation(this.shaderProgram, "uUseLighting");
+        this.shaderProgram.ambientColorUniform = this.gl.getUniformLocation(this.shaderProgram, "uAmbientColor");
+        this.shaderProgram.lightingDirectionUniform = this.gl.getUniformLocation(this.shaderProgram, "uLightingDirection");
+        this.shaderProgram.directionalColorUniform = this.gl.getUniformLocation(this.shaderProgram, "uDirectionalColor");                
     } 
 
     getShader(id) {
@@ -251,32 +303,43 @@ class ThreeDBarChart extends ClassHelper {
       
                       varying vec2 vTextureCoord;
                       varying vec4 vColor;
+                      varying vec3 vLightWeighting;
                         
                       uniform vec4 vColor1;
                       uniform vec4 vColor2;
                       uniform sampler2D uSampler;
 
                       void main(void) {
-                          gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t)) * vColor1 + vColor * vColor2;
+                          vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t)) * vColor1 + vColor * vColor2;
+                          gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);                          
                       }`;
         return script;    
     }
     
     getVShaderScript() {
         let script = `attribute vec3 aVertexPosition;
+                      attribute vec3 aVertexNormal;
                       attribute vec4 aVertexColor;
                       attribute vec2 aTextureCoord;
 
                       uniform mat4 uMVMatrix;
                       uniform mat4 uPMatrix;
-                      
+                      uniform mat3 uNMatrix;
+                      uniform vec3 uAmbientColor;
+                      uniform vec3 uLightingDirection;
+                      uniform vec3 uDirectionalColor;
                       varying vec4 vColor;
                       varying vec2 vTextureCoord;
+                      varying vec3 vLightWeighting;                      
+
 
                       void main(void) {
                           gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-                          vColor = aVertexColor;
                           vTextureCoord = aTextureCoord;
+                          vec3 transformedNormal = uNMatrix * aVertexNormal;
+                          float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);
+                          vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;
+                          vColor = aVertexColor * vec4(vLightWeighting, 1.0);                          
                       }`;
         return script;    
     }    

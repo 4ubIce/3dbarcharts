@@ -19,7 +19,8 @@ class Character extends ClassHelper {
             },            
             rotate: 0,
             xRotation: 0,
-            yRotation: 0            
+            yRotation: 0,
+            zRotation: 0            
         };
         this.canvas;
         this.mvMatrix = mvMatrix;
@@ -74,7 +75,11 @@ class Character extends ClassHelper {
     
     getyRotation() {
         return this.cfg.yRotation;
-    }           
+    } 
+    
+    getzRotation() {
+        return this.cfg.zRotation;
+    }              
 
     draw() {
         this.initTextCanvas();
@@ -174,13 +179,14 @@ class Character extends ClassHelper {
         let z = this.getZ();    
         let rotate = this.getRotate();
         let xRotation = this.getxRotation();
-        let yRotation = this.getyRotation(); 
+        let yRotation = this.getyRotation();
+        let zRotation = this.getzRotation(); 
         let whiteColor = new Float32Array([1, 1, 1, 1]);
         let blackColor = new Float32Array([0, 0, 0, 1]);
         
         mat4.perspective(45, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
         mat4.translate(this.mvMatrix, [x, y, z]);        
-        mat4.rotate(this.mvMatrix, rotate, [xRotation, yRotation, 0]);
+        mat4.rotate(this.mvMatrix, rotate, [xRotation, yRotation, zRotation]);
         
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexPositionBuffer);
         this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.squareVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);

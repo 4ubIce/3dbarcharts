@@ -19,7 +19,6 @@ class CoordinatePlaneText extends ClassHelper {
             xRotation: 0,
             yRotation: 0,
             zRotation: 0,
-            k: 0,
             text: {
                       text: [],            
                       size: 24,
@@ -30,7 +29,9 @@ class CoordinatePlaneText extends ClassHelper {
                       rotate: 0,
                       xRotation: 0,
                       yRotation: 0,
-                      position: 'x'                      
+                      zRotation: 0,
+                      position: 'x',
+                      offset: 0                      
             }
         };
         this.axis;
@@ -92,10 +93,6 @@ class CoordinatePlaneText extends ClassHelper {
         return this.cfg.zRotation;
     }
     
-    getK() {
-        return this.cfg.k;
-    }          
-
     getText() {
         return this.cfg.text.text;
     }
@@ -130,11 +127,19 @@ class CoordinatePlaneText extends ClassHelper {
     
     getTextyRotation() {
         return this.cfg.text.yRotation;
-    }            
+    }
+    
+    getTextzRotation() {
+        return this.cfg.text.zRotation;
+    }                
     
     getTextPosition() {
         return this.cfg.text.position;
-    }                  
+    }
+    
+    getOffset() {
+        return this.cfg.text.offset;
+    }                       
 
     draw() {
         let xTexture, yTexture, zTexture; 
@@ -152,7 +157,7 @@ class CoordinatePlaneText extends ClassHelper {
         let xRotation = this.getxRotation();
         let yRotation = this.getyRotation();
         let zRotation = this.getzRotation();
-        let k = this.getK();
+        let offset = this.getOffset();
         let t = this.getText();
         let textWidth = this.getTextWidth();
         let textHeight = this.getTextHeight();
@@ -162,6 +167,7 @@ class CoordinatePlaneText extends ClassHelper {
         let textRotate = this.getTextRotate();
         let textxRotation = this.getTextxRotation();
         let textyRotation = this.getTextyRotation();
+        let textzRotation = this.getTextzRotation();
         let posX = 0;
         let posY = 0;
         if (this.getTextPosition() == 'x') {
@@ -176,11 +182,11 @@ class CoordinatePlaneText extends ClassHelper {
         this.axis.draw();
 
         for (let i = 0; i < posX * yTicksCount + posY * xTicksCount; i++) {
-            xTexture = posX * (width + ledge) + posY * (i * xlp - textWidth / 2 + k * textWidth);
-            yTexture = posX * (i * ylp - textHeight / 2) + posY * (height + ledge + textHeight - k * textWidth);
+            xTexture = posX * (width + ledge) + posY * (i * xlp - textWidth / 2 + offset);
+            yTexture = posX * (i * ylp - textHeight / 2) + posY * (height + ledge + textHeight - offset);
             zTexture = 0;
             this.mvPushMatrix();
-            let char = new Character(this.gl, this.shaderProgram, this.mvMatrix, {x: xTexture, y: yTexture, z: zTexture, text: {text: t[i], size: textSize, font: textFont, color: textColor, width: textWidth, height: textHeight}, rotate: textRotate, xRotation: textxRotation, yRotation: textyRotation});
+            let char = new Character(this.gl, this.shaderProgram, this.mvMatrix, {x: xTexture, y: yTexture, z: zTexture, text: {text: t[i], size: textSize, font: textFont, color: textColor, width: textWidth, height: textHeight}, rotate: textRotate, xRotation: textxRotation, yRotation: textyRotation, zRotation: textzRotation});
             char.draw();
             this.chars.push(char);
             this.mvPopMatrix();
