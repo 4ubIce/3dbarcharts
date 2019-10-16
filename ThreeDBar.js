@@ -17,6 +17,8 @@ class ThreeDBar extends ClassHelper {
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
         super.loadConfig(config);
+        this.initBuffers(this.cfg.width / 2, this.cfg.height);
+        this.initTexture();        
     }
     
     getBarColor() {
@@ -24,8 +26,6 @@ class ThreeDBar extends ClassHelper {
     }
     
     draw() {
-        this.initBuffers(this.cfg.width / 2, this.cfg.height);
-        this.initTexture();
         this.drawScene();
     }
 

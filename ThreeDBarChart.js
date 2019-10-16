@@ -35,7 +35,7 @@ class ThreeDBarChart extends ClassHelper {
         super.loadConfig(config);
         this.animationSpeed = this.getAnimationSpeed();
         this.init();
-        this.loadDataAndDraw(file);
+        this.loadData(file);
         this.element.onmousedown = () => {this.mouseDownEvent(event);};
         this.element.onmouseup = () => {this.mouseUpEvent();};
         //this.element.oncontextmenu = () => {return false;};
@@ -92,56 +92,12 @@ class ThreeDBarChart extends ClassHelper {
     
     init() {
         this.initShaders();
-        
-        this.cubeVertexNormalBuffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexNormalBuffer);
-        var vertexNormals = [
-          // Front face
-           0.0,  0.0,  1.0,
-           0.0,  0.0,  1.0,
-           0.0,  0.0,  1.0,
-           0.0,  0.0,  1.0,
-
-          // Back face
-           0.0,  0.0, -1.0,
-           0.0,  0.0, -1.0,
-           0.0,  0.0, -1.0,
-           0.0,  0.0, -1.0,
-
-          // Top face
-           0.0,  1.0,  0.0,
-           0.0,  1.0,  0.0,
-           0.0,  1.0,  0.0,
-           0.0,  1.0,  0.0,
-
-          // Bottom face
-           0.0, -1.0,  0.0,
-           0.0, -1.0,  0.0,
-           0.0, -1.0,  0.0,
-           0.0, -1.0,  0.0,
-
-          // Right face
-           1.0,  0.0,  0.0,
-           1.0,  0.0,  0.0,
-           1.0,  0.0,  0.0,
-           1.0,  0.0,  0.0,
-
-          // Left face
-          -1.0,  0.0,  0.0,
-          -1.0,  0.0,  0.0,
-          -1.0,  0.0,  0.0,
-          -1.0,  0.0,  0.0,
-        ];
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertexNormals), this.gl.STATIC_DRAW);
-        this.cubeVertexNormalBuffer.itemSize = 3;
-        this.cubeVertexNormalBuffer.numItems = 24; 
-        this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, this.cubeVertexNormalBuffer.itemSize, this.gl.FLOAT, false, 0, 0);        
-        
+        this.initBuffers();
     }
 
-    loadDataAndDraw(file) {
+    loadData(file) {
         d3.json(file)
-          .then((d) => {this.data = d;this.drawScene();});
+          .then((d) => {this.data = d;this.processData(d);});
           //.catch((error) => {console.error('can not read file: ' + file + ' ' + new Error().stack);});        
     }    
     
@@ -152,11 +108,8 @@ class ThreeDBarChart extends ClassHelper {
         }
     }    
     
-    drawScene() {
-    
+    processData(data) {
         let barColor;
-        let data = this.data;
-        let rowCount = data.length;
         let w = this.getWidth();
         let h = this.getHeight();
         let d = this.getDepth();
@@ -168,7 +121,9 @@ class ThreeDBarChart extends ClassHelper {
         let tw = this.getTextWidth();
         let th = this.getTextHeight();         
         let maxValue = d3.max(data, function(row) {return d3.max(d3.values(row)[0], function(val) {return val.Value})});
-        let maxColumnCount = d3.max(data, function(row) {return d3.values(d3.values(row)[0]).length});
+        
+        this.rowCount = data.length;
+        this.maxColumnCount = d3.max(data, function(row) {return d3.values(d3.values(row)[0]).length});
 
         const yScale = d3.scaleLinear()
                        .domain([0, maxValue])
@@ -184,39 +139,52 @@ class ThreeDBarChart extends ClassHelper {
 
         let axisZValue = [];
         for (let i = 0; i < data.length; i++) {
-            axisZValue = axisZValue.concat(d3.keys(data[i]));
+            axisZValue = axisZValue.concat(d3.keys(data[i])[0]);
         }
-                        
+        
+        for (let i = 0; i < data.length; i++) {
+            barColor = data[i].color;
+            for (let j = 0; j < d3.values(data[i])[0].length; j++) {
+                let bar = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(d3.values(data[i])[0][j].Value), barColor: barColor});
+                this.barArray.push(bar);
+            };
+        };
+        
+        const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -d, z: 0, width: w, height: d, xTicksCount: this.maxColumnCount, yTicksCount: this.rowCount, tickStep: d / (this.rowCount - 1), ledge: l, rotate: 90, xRotation: 1, text: {text: axisXValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: 180, xRotation: 1}});
+        this.axisArray.push(axisX);
+        const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue), xTicksCount: this.maxColumnCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, text: {text: axisYValue, size: ts, font: tf, color: tc, width: tw, height: th}});     
+        this.axisArray.push(axisY);
+        const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2 - l, y: -1, z: 0, width: d, height: 1 + yScale(maxValue), xTicksCount: this.rowCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1, text: {text: axisZValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: -180, yRotation: 1, offset: this.getTextWidth()}});     
+        this.axisArray.push(axisZ);
+        
+        this.drawScene();
+    }
+    
+    drawScene() {
+
+        let w = this.getWidth();
+        let d = this.getDepth();
+        let k = 0;                               
+
         if (this.gl) {
             mat4.rotate(this.mvMatrix, this.animationSpeed, [this.xRotation, 0, this.zRotation]);
-            for (let i = 0; i < data.length; i++) {
-                barColor = data[i].color;
-                for (let j = 0; j < d3.values(data[i])[0].length; j++) {
+            for (let i = 0; i < this.data.length; i++) {
+                for (let j = 0; j < d3.values(this.data[i])[0].length; j++) {
                     this.mvPushMatrix();
-                    mat4.translate(this.mvMatrix, [-w / 2 + j * w / (maxColumnCount - 1), 0.0, i * d / (rowCount - 1)]);
-                    let bar = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(d3.values(data[i])[0][j].Value), barColor: barColor});
-                    bar.draw();
-                    this.barArray.push(bar);
+                    mat4.translate(this.mvMatrix, [-w / 2 + j * w / (this.maxColumnCount - 1), 0.0, i * d / (this.rowCount - 1)]);
+                    this.barArray[k].mvMatrix = this.mvMatrix;
+                    this.barArray[k].draw();
                     this.mvPopMatrix();
-                };
+                    k++;
+                }
             };
             
-            this.mvPushMatrix();
-            const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -d, z: 0, width: w, height: d, xTicksCount: maxColumnCount, yTicksCount: rowCount, tickStep: d / (rowCount - 1), ledge: l, rotate: 90, xRotation: 1, text: {text: axisXValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: 180, xRotation: 1}});
-            axisX.draw();
-            this.axisArray.push(axisX);     
-            this.mvPopMatrix();            
-            this.mvPushMatrix();
-            const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue), xTicksCount: maxColumnCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, text: {text: axisYValue, size: ts, font: tf, color: tc, width: tw, height: th}});     
-            axisY.draw();
-            this.axisArray.push(axisY);
-            this.mvPopMatrix();
-            this.mvPushMatrix();
-            const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2 - l, y: -1, z: 0, width: d, height: 1 + yScale(maxValue), xTicksCount: rowCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1, text: {text: axisZValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: -180, yRotation: 1, offset: this.getTextWidth()}});     
-            axisZ.draw();
-            this.axisArray.push(axisZ);
-            this.mvPopMatrix();            
-                        
+            for (let i = 0; i < this.axisArray.length; i++) {
+                this.mvPushMatrix();
+                this.axisArray[i].mvMatrix = this.mvMatrix;
+                this.axisArray[i].draw();
+                this.mvPopMatrix();
+            }
         }                        
     }
     
@@ -343,6 +311,52 @@ class ThreeDBarChart extends ClassHelper {
                       }`;
         return script;    
     }    
+    
+    initBuffers() {
+        this.cubeVertexNormalBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexNormalBuffer);
+        var vertexNormals = [
+          // Front face
+           0.0,  0.0,  1.0,
+           0.0,  0.0,  1.0,
+           0.0,  0.0,  1.0,
+           0.0,  0.0,  1.0,
+
+          // Back face
+           0.0,  0.0, -1.0,
+           0.0,  0.0, -1.0,
+           0.0,  0.0, -1.0,
+           0.0,  0.0, -1.0,
+
+          // Top face
+           0.0,  1.0,  0.0,
+           0.0,  1.0,  0.0,
+           0.0,  1.0,  0.0,
+           0.0,  1.0,  0.0,
+
+          // Bottom face
+           0.0, -1.0,  0.0,
+           0.0, -1.0,  0.0,
+           0.0, -1.0,  0.0,
+           0.0, -1.0,  0.0,
+
+          // Right face
+           1.0,  0.0,  0.0,
+           1.0,  0.0,  0.0,
+           1.0,  0.0,  0.0,
+           1.0,  0.0,  0.0,
+
+          // Left face
+          -1.0,  0.0,  0.0,
+          -1.0,  0.0,  0.0,
+          -1.0,  0.0,  0.0,
+          -1.0,  0.0,  0.0,
+        ];
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertexNormals), this.gl.STATIC_DRAW);
+        this.cubeVertexNormalBuffer.itemSize = 3;
+        this.cubeVertexNormalBuffer.numItems = 24; 
+        this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, this.cubeVertexNormalBuffer.itemSize, this.gl.FLOAT, false, 0, 0);        
+    }
     
     degToRad(degrees) {
         return degrees * Math.PI / 180;
