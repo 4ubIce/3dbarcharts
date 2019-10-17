@@ -97,7 +97,7 @@ class ThreeDBarChart extends ClassHelper {
 
     loadData(file) {
         d3.json(file)
-          .then((d) => {this.data = d;this.processData(d);});
+          .then((d) => {this.data = d;this.initObject(d);});
           //.catch((error) => {console.error('can not read file: ' + file + ' ' + new Error().stack);});        
     }    
     
@@ -108,8 +108,8 @@ class ThreeDBarChart extends ClassHelper {
         }
     }    
     
-    processData(data) {
-        let barColor;
+    initObject(data) {
+        let bc;
         let w = this.getWidth();
         let h = this.getHeight();
         let d = this.getDepth();
@@ -143,9 +143,9 @@ class ThreeDBarChart extends ClassHelper {
         }
         
         for (let i = 0; i < data.length; i++) {
-            barColor = data[i].color;
+            bc = data[i].color;
             for (let j = 0; j < d3.values(data[i])[0].length; j++) {
-                let bar = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(d3.values(data[i])[0][j].Value), barColor: barColor});
+                let bar = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(d3.values(data[i])[0][j].Value), barColor: bc});
                 this.barArray.push(bar);
             };
         };

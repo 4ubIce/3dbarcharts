@@ -23,6 +23,7 @@ class CoordinatePlane extends ClassHelper {
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
         super.loadConfig(config);
+        this.initBuffers();
     }
     
     getX() {
@@ -74,7 +75,6 @@ class CoordinatePlane extends ClassHelper {
     }           
 
     draw() {
-        this.initBuffers();
         this.drawScene();
     }
 
@@ -129,10 +129,6 @@ class CoordinatePlane extends ClassHelper {
     }
 
     drawScene() { 
-    
-        let rotate = this.getRotate();
-        let xRotation = this.getxRotation();
-        let yRotation = this.getyRotation(); 
         
         mat4.perspective(45, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
 

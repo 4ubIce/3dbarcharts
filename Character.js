@@ -27,6 +27,9 @@ class Character extends ClassHelper {
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
         super.loadConfig(config);
+        this.initTextCanvas();
+        this.initTexture();
+        this.initBuffers();        
     }
     
     getX() {
@@ -82,9 +85,6 @@ class Character extends ClassHelper {
     }              
 
     draw() {
-        this.initTextCanvas();
-        this.initTexture();
-        this.initBuffers();
         this.drawScene();
     }
 
@@ -159,7 +159,7 @@ class Character extends ClassHelper {
         
         this.squareVertexColorBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexColorBuffer);
-        let colors = [0.0, 0.0, 0.0, 0.0];
+        let colors = [1.0, 1.0, 1.0, 0.0];
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);
         this.squareVertexColorBuffer.itemSize = 4;
         this.squareVertexColorBuffer.numItems = 1;
