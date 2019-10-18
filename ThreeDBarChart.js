@@ -20,7 +20,9 @@ class ThreeDBarChart {
                       height: 0.3
             }            
         };
-        this.gl = this.initGL(this.element);
+        let sp = new ShaderProgramm(this.element);
+        this.gl = sp.gl;
+        this.shaderProgram = sp.shaderProgram;
         this.barArray = [];
         this.axisArray = [];
         this.animationOn = 0;
@@ -34,7 +36,7 @@ class ThreeDBarChart {
         this.ch = new ClassHelper();
         this.ch.loadConfig(this.cfg, config);
         this.animationSpeed = this.getAnimationSpeed();
-        this.init();
+        let buffers = new Buffers(this.gl, this.shaderProgram);
         this.loadData(file);
         this.element.onmousedown = () => {this.mouseDownEvent(event);};
         this.element.onmouseup = () => {this.mouseUpEvent();};
@@ -88,11 +90,6 @@ class ThreeDBarChart {
 
     getTextHeight() {
         return this.cfg.text.height;
-    }
-    
-    init() {
-        this.initShaders();
-        this.initBuffers();
     }
 
     loadData(file) {
@@ -186,176 +183,6 @@ class ThreeDBarChart {
                 this.mvPopMatrix();
             }
         }                        
-    }
-    
-    initGL(canvas) {
-        let gl;
-        try {
-            gl = canvas.getContext("webgl");
-            gl.viewportWidth = canvas.width;
-            gl.viewportHeight = canvas.height;
-            gl.clearColor(0.0, 0.0, 0.0, 0.0);
-            gl.enable(gl.DEPTH_TEST);
-            gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                        
-        } catch(e) {
-        }
-        if (!gl) {
-           alert("Could not initialise WebGL, sorry :-(");
-        }
-        return gl;
-    }
-
-    initShaders() {
-        let fragmentShader = this.getShader('shader-fs');
-        let vertexShader = this.getShader('shader-vs');
-
-        this.shaderProgram = this.gl.createProgram();
-        this.gl.attachShader(this.shaderProgram, vertexShader);
-        this.gl.attachShader(this.shaderProgram, fragmentShader);
-        this.gl.linkProgram(this.shaderProgram);
-
-        if (!this.gl.getProgramParameter(this.shaderProgram, this.gl.LINK_STATUS)) {
-           alert("Could not initialise shaders");
-        }
-
-        this.gl.useProgram(this.shaderProgram);
-        this.shaderProgram.vertexPositionAttribute = this.gl.getAttribLocation(this.shaderProgram, "aVertexPosition");
-        this.gl.enableVertexAttribArray(this.shaderProgram.vertexPositionAttribute);
-        this.shaderProgram.vertexColorAttribute = this.gl.getAttribLocation(this.shaderProgram, "aVertexColor");
-        this.gl.enableVertexAttribArray(this.shaderProgram.vertexColorAttribute);
-        this.shaderProgram.vertexNormalAttribute = this.gl.getAttribLocation(this.shaderProgram, "aVertexNormal");
-        this.gl.enableVertexAttribArray(this.shaderProgram.vertexNormalAttribute);         
-        this.shaderProgram.textureCoordAttribute = this.gl.getAttribLocation(this.shaderProgram, "aTextureCoord");
-        this.gl.enableVertexAttribArray(this.shaderProgram.textureCoordAttribute);        
-        
-        this.shaderProgram.pMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uPMatrix");
-        this.shaderProgram.mvMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uMVMatrix");
-        this.shaderProgram.nMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uNMatrix");
-        this.shaderProgram.samplerUniform = this.gl.getUniformLocation(this.shaderProgram, "uSampler");
-        this.shaderProgram.vColor1 = this.gl.getUniformLocation(this.shaderProgram, "vColor1");
-        this.shaderProgram.vColor2 = this.gl.getUniformLocation(this.shaderProgram, "vColor2");
-        this.shaderProgram.useLightingUniform = this.gl.getUniformLocation(this.shaderProgram, "uUseLighting");
-        this.shaderProgram.ambientColorUniform = this.gl.getUniformLocation(this.shaderProgram, "uAmbientColor");
-        this.shaderProgram.lightingDirectionUniform = this.gl.getUniformLocation(this.shaderProgram, "uLightingDirection");
-        this.shaderProgram.directionalColorUniform = this.gl.getUniformLocation(this.shaderProgram, "uDirectionalColor");                
-    } 
-
-    getShader(id) {
-        let shaderScript;
-        let shader;
-        if (id == 'shader-fs') {
-            shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
-            shaderScript = this.getFShaderScript();
-        } else if (id == 'shader-vs') {
-            shader = this.gl.createShader(this.gl.VERTEX_SHADER);
-            shaderScript = this.getVShaderScript();
-        } else {
-            return null;
-        }
-
-        this.gl.shaderSource(shader, shaderScript);
-        this.gl.compileShader(shader);
-
-        if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-            alert(this.gl.getShaderInfoLog(shader));
-            return null;
-        }
-
-        return shader;
-    } 
-        
-    getFShaderScript() {
-        let script = `precision mediump float;
-      
-                      varying vec2 vTextureCoord;
-                      varying vec4 vColor;
-                      varying vec3 vLightWeighting;
-                        
-                      uniform vec4 vColor1;
-                      uniform vec4 vColor2;
-                      uniform sampler2D uSampler;
-
-                      void main(void) {
-                          vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t)) * vColor1 + vColor * vColor2;
-                          gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);                          
-                      }`;
-        return script;    
-    }
-    
-    getVShaderScript() {
-        let script = `attribute vec3 aVertexPosition;
-                      attribute vec3 aVertexNormal;
-                      attribute vec4 aVertexColor;
-                      attribute vec2 aTextureCoord;
-
-                      uniform mat4 uMVMatrix;
-                      uniform mat4 uPMatrix;
-                      uniform mat3 uNMatrix;
-                      uniform vec3 uAmbientColor;
-                      uniform vec3 uLightingDirection;
-                      uniform vec3 uDirectionalColor;
-                      varying vec4 vColor;
-                      varying vec2 vTextureCoord;
-                      varying vec3 vLightWeighting;                      
-
-
-                      void main(void) {
-                          gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-                          vTextureCoord = aTextureCoord;
-                          vec3 transformedNormal = uNMatrix * aVertexNormal;
-                          float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);
-                          vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;
-                          vColor = aVertexColor * vec4(vLightWeighting, 1.0);                          
-                      }`;
-        return script;    
-    }    
-    
-    initBuffers() {
-        this.cubeVertexNormalBuffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexNormalBuffer);
-        var vertexNormals = [
-          // Front face
-           0.0,  0.0,  1.0,
-           0.0,  0.0,  1.0,
-           0.0,  0.0,  1.0,
-           0.0,  0.0,  1.0,
-
-          // Back face
-           0.0,  0.0, -1.0,
-           0.0,  0.0, -1.0,
-           0.0,  0.0, -1.0,
-           0.0,  0.0, -1.0,
-
-          // Top face
-           0.0,  1.0,  0.0,
-           0.0,  1.0,  0.0,
-           0.0,  1.0,  0.0,
-           0.0,  1.0,  0.0,
-
-          // Bottom face
-           0.0, -1.0,  0.0,
-           0.0, -1.0,  0.0,
-           0.0, -1.0,  0.0,
-           0.0, -1.0,  0.0,
-
-          // Right face
-           1.0,  0.0,  0.0,
-           1.0,  0.0,  0.0,
-           1.0,  0.0,  0.0,
-           1.0,  0.0,  0.0,
-
-          // Left face
-          -1.0,  0.0,  0.0,
-          -1.0,  0.0,  0.0,
-          -1.0,  0.0,  0.0,
-          -1.0,  0.0,  0.0,
-        ];
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertexNormals), this.gl.STATIC_DRAW);
-        this.cubeVertexNormalBuffer.itemSize = 3;
-        this.cubeVertexNormalBuffer.numItems = 24; 
-        this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, this.cubeVertexNormalBuffer.itemSize, this.gl.FLOAT, false, 0, 0);        
     }
     
     degToRad(degrees) {
