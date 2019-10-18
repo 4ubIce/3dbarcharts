@@ -20,7 +20,6 @@ class CoordinatePlane {
         };
         this.mvMatrix = mvMatrix;
         this.pMatrix = mat4.create();
-        this.mvMatrixStack = [];
         this.ch = new ClassHelper();
         this.ch.loadConfig(this.cfg, config);        
         this.init();

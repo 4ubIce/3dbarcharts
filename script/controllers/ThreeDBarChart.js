@@ -28,12 +28,12 @@ class ThreeDBarChart {
         this.mvMatrix = mat4.create();
         mat4.identity(this.mvMatrix);
         mat4.translate(this.mvMatrix, [0.0, 0.0, -10.0]);        
-        this.mvMatrixStack = [];
         this.xRotation = 0;
         this.zRotation = 0;
         this.ch = new ClassHelper();
         this.ch.loadConfig(this.cfg, config);
         this.loadData(file);
+        this.ms = new MatrixStack(); 
         element.onmousedown = () => {this.mouseDownEvent(event);};
         element.onmouseup = () => {this.mouseUpEvent();};
         //this.element.oncontextmenu = () => {return false;};
@@ -139,16 +139,29 @@ class ThreeDBarChart {
         for (let i = 0; i < data.length; i++) {
             bc = data[i].color;
             for (let j = 0; j < d3.values(data[i])[0].length; j++) {
-                let bar = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix, {height: yScale(d3.values(data[i])[0][j].Value), barColor: bc});
+                let bar = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix,
+                                 {height: yScale(d3.values(data[i])[0][j].Value), barColor: bc});
                 this.barArray.push(bar);
             };
         };
         
-        const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -d, z: 0, width: w, height: d, xTicksCount: this.maxColumnCount, yTicksCount: this.rowCount, tickStep: d / (this.rowCount - 1), ledge: l, rotate: 90, xRotation: 1, text: {text: axisXValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: 180, xRotation: 1}});
+        const axisX = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix,
+                             {x: -w / 2, y: -d, z: 0, width: w, height: d,
+                              xTicksCount: this.maxColumnCount, yTicksCount: this.rowCount,
+                              tickStep: d / (this.rowCount - 1), ledge: l, rotate: 90, xRotation: 1,
+                              text: {text: axisXValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: 180, xRotation: 1}});
         this.axisArray.push(axisX);
-        const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue), xTicksCount: this.maxColumnCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, text: {text: axisYValue, size: ts, font: tf, color: tc, width: tw, height: th}});     
+        const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix,
+                             {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue),
+                              xTicksCount: this.maxColumnCount, yTicksCount: axisTicksCount,
+                              tickStep: tickStep, ledge: l,
+                              text: {text: axisYValue, size: ts, font: tf, color: tc, width: tw, height: th}});     
         this.axisArray.push(axisY);
-        const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix, {x: -w / 2 - l, y: -1, z: 0, width: d, height: 1 + yScale(maxValue), xTicksCount: this.rowCount, yTicksCount: axisTicksCount, tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1, text: {text: axisZValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: -180, yRotation: 1, offset: this.getTextWidth()}});     
+        const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix,
+                             {x: -w / 2 - l, y: -1, z: 0, width: d, height: 1 + yScale(maxValue),
+                              xTicksCount: this.rowCount, yTicksCount: axisTicksCount,
+                              tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1,
+                              text: {text: axisZValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: -180, yRotation: 1, offset: this.getTextWidth()}});     
         this.axisArray.push(axisZ);
         
         this.drawScene();
@@ -165,39 +178,26 @@ class ThreeDBarChart {
             mat4.rotate(this.mvMatrix, animationSpeed, [this.xRotation, 0, this.zRotation]);
             for (let i = 0; i < this.data.length; i++) {
                 for (let j = 0; j < d3.values(this.data[i])[0].length; j++) {
-                    this.mvPushMatrix();
+                    this.ms.push(this.mvMatrix);
                     mat4.translate(this.mvMatrix, [-w / 2 + j * w / (this.maxColumnCount - 1), 0.0, i * d / (this.rowCount - 1)]);
                     this.barArray[k].mvMatrix = this.mvMatrix;
                     this.barArray[k].draw();
-                    this.mvPopMatrix();
+                    this.mvMatrix = this.ms.pop();
                     k++;
                 }
             };
             
             for (let i = 0; i < this.axisArray.length; i++) {
-                this.mvPushMatrix();
+                this.ms.push(this.mvMatrix);
                 this.axisArray[i].mvMatrix = this.mvMatrix;
                 this.axisArray[i].draw();
-                this.mvPopMatrix();
+                this.mvMatrix = this.ms.pop();
             }
         }                        
     }
     
     degToRad(degrees) {
         return degrees * Math.PI / 180;
-    }
-    
-    mvPushMatrix() {
-        let copy = mat4.create();
-        mat4.set(this.mvMatrix, copy);
-        this.mvMatrixStack.push(copy);
-    }
-
-    mvPopMatrix() {
-        if (this.mvMatrixStack.length == 0) {
-          throw "Invalid popMatrix!";
-        }
-        this.mvMatrix = this.mvMatrixStack.pop();
     }
     
     mouseDownEvent(e) {

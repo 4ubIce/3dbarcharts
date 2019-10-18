@@ -36,8 +36,8 @@ class CoordinatePlaneText {
         this.axisPlane;
         this.axisChars = [];
         this.mvMatrix = mvMatrix;
-        this.mvMatrixStack = [];
         this.ch = new ClassHelper();
+        this.ms = new MatrixStack();
         this.ch.loadConfig(this.cfg, config);        
         this.init();
     }
@@ -165,19 +165,25 @@ class CoordinatePlaneText {
         let textzRotation = this.getTextzRotation();
         let posX = 0;
         let posY = 0;
+        
         if (this.getTextPosition() == 'x') {
             posX = 1;
         } else {
             posY = 1;
         }
 
-        this.axisPlane = new CoordinatePlane(this.gl, this.shaderProgram, this.mvMatrix, {x: 0, y: 0, z: 0, width: width, height: height, xTicksCount: xTicksCount, yTicksCount: yTicksCount, tickStep: ylp, ledge: ledge});
+        this.axisPlane = new CoordinatePlane(this.gl, this.shaderProgram, this.mvMatrix,
+                               {x: 0, y: 0, z: 0, width: width, height: height,
+                                xTicksCount: xTicksCount, yTicksCount: yTicksCount, tickStep: ylp, ledge: ledge});
 
         for (let i = 0; i < posX * yTicksCount + posY * xTicksCount; i++) {
             xTexture = posX * (width + ledge) + posY * (i * xlp - textWidth / 2 + offset);
             yTexture = posX * (i * ylp - textHeight / 2) + posY * (height + ledge + textHeight - offset);
             zTexture = 0;
-            let axisChar = new Character(this.gl, this.shaderProgram, this.mvMatrix, {x: xTexture, y: yTexture, z: zTexture, text: {text: t[i], size: textSize, font: textFont, color: textColor, width: textWidth, height: textHeight}, rotate: textRotate, xRotation: textxRotation, yRotation: textyRotation, zRotation: textzRotation});
+            let axisChar = new Character(this.gl, this.shaderProgram, this.mvMatrix,
+                                  {x: xTexture, y: yTexture, z: zTexture,
+                                   text: {text: t[i], size: textSize, font: textFont, color: textColor, width: textWidth, height: textHeight},
+                                   rotate: textRotate, xRotation: textxRotation, yRotation: textyRotation, zRotation: textzRotation});
             this.axisChars.push(axisChar);
         }
     }
@@ -199,10 +205,10 @@ class CoordinatePlaneText {
         this.axisPlane.draw();
 
         for (let i = 0; i < this.axisChars.length; i++) {
-            this.mvPushMatrix();
+            this.ms.push(this.mvMatrix);
             this.axisChars[i].mvMatrix = this.mvMatrix;
             this.axisChars[i].draw();
-            this.mvPopMatrix();
+            this.mvMatrix = this.ms.pop();
         }        
     }
 
@@ -213,19 +219,6 @@ class CoordinatePlaneText {
     degToRad(degrees) {
         return degrees * Math.PI / 180;
     }
-    
-    mvPushMatrix() {
-        let copy = mat4.create();
-        mat4.set(this.mvMatrix, copy);
-        this.mvMatrixStack.push(copy);
-    }
-
-    mvPopMatrix() {
-        if (this.mvMatrixStack.length == 0) {
-          throw "Invalid popMatrix!";
-        }
-        this.mvMatrix = this.mvMatrixStack.pop();
-    }        
 }
 
 
