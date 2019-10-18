@@ -1,8 +1,7 @@
 ﻿'use strict';
-class ThreeDBarChart extends ClassHelper {
+class ThreeDBarChart {
 
     constructor(element, config, file) {
-        super();
         this.element = element;
         this.cfg = {
             x: 0,
@@ -32,7 +31,8 @@ class ThreeDBarChart extends ClassHelper {
         this.mvMatrixStack = [];
         this.xRotation = 0;
         this.zRotation = 0;
-        super.loadConfig(config);
+        this.ch = new ClassHelper();
+        this.ch.loadConfig(this.cfg, config);
         this.animationSpeed = this.getAnimationSpeed();
         this.init();
         this.loadData(file);

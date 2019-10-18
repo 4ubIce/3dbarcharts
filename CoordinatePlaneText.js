@@ -1,8 +1,7 @@
 ﻿'use strict';
-class CoordinatePlaneText extends ClassHelper {
+class CoordinatePlaneText {
 
     constructor(gl, shaderProgram, mvMatrix, config) {
-        super();
         this.gl = gl;
         this.shaderProgram = shaderProgram;
         this.cfg = {
@@ -38,7 +37,8 @@ class CoordinatePlaneText extends ClassHelper {
         this.axisChars = [];
         this.mvMatrix = mvMatrix;
         this.mvMatrixStack = [];
-        super.loadConfig(config);
+        this.ch = new ClassHelper();
+        this.ch.loadConfig(this.cfg, config);        
         this.initObject();
     }
 

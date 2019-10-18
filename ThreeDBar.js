@@ -1,8 +1,7 @@
 ﻿'use strict';
-class ThreeDBar extends ClassHelper {
+class ThreeDBar {
 
     constructor(gl, shaderProgram, mvMatrix, config) {
-        super();
         this.gl = gl;
         this.shaderProgram = shaderProgram;
         this.cfg = {
@@ -16,7 +15,8 @@ class ThreeDBar extends ClassHelper {
         this.mvMatrix = mvMatrix;
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
-        super.loadConfig(config);
+        this.ch = new ClassHelper();
+        this.ch.loadConfig(this.cfg, config);        
         this.initBuffers(this.cfg.width / 2, this.cfg.height);
         this.initTexture();        
     }

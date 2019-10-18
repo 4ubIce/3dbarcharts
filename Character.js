@@ -1,8 +1,7 @@
 ﻿'use strict';
-class Character extends ClassHelper {
+class Character {
 
     constructor(gl, shaderProgram, mvMatrix, config) {
-        super();
         this.gl = gl;
         this.shaderProgram = shaderProgram;
         this.cfg = {
@@ -26,7 +25,8 @@ class Character extends ClassHelper {
         this.mvMatrix = mvMatrix;
         this.pMatrix = mat4.create();
         this.mvMatrixStack = [];
-        super.loadConfig(config);
+        this.ch = new ClassHelper();
+        this.ch.loadConfig(this.cfg, config);        
         this.initTextCanvas();
         this.initTexture();
         this.initBuffers();        
