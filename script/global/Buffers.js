@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 class Buffers {
 
     constructor(gl, sp) {
