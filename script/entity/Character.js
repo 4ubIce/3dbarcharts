@@ -27,9 +27,7 @@ class Character {
         this.mvMatrixStack = [];
         this.ch = new ClassHelper();
         this.ch.loadConfig(this.cfg, config);        
-        this.initTextCanvas();
-        this.initTexture();
-        this.initBuffers();        
+        this.init();
     }
     
     getX() {
@@ -83,7 +81,13 @@ class Character {
     getzRotation() {
         return this.cfg.zRotation;
     }              
-
+    
+    init() {
+        this.initTextCanvas();
+        this.initTexture();
+        this.initBuffers();    
+    }
+    
     draw() {
         this.drawScene();
     }

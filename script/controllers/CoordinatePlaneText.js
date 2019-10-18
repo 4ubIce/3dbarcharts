@@ -39,7 +39,7 @@ class CoordinatePlaneText {
         this.mvMatrixStack = [];
         this.ch = new ClassHelper();
         this.ch.loadConfig(this.cfg, config);        
-        this.initObject();
+        this.init();
     }
 
     getX() {
@@ -142,7 +142,7 @@ class CoordinatePlaneText {
         return this.cfg.text.offset;
     }                       
     
-    initObject() {
+    init() {
 
         let xTexture, yTexture, zTexture; 
         let width = this.getWidth();

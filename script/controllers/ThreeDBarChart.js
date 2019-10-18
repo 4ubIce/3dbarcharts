@@ -2,7 +2,6 @@
 class ThreeDBarChart {
 
     constructor(element, config, file) {
-        this.element = element;
         this.cfg = {
             x: 0,
             y: 0,
@@ -20,13 +19,12 @@ class ThreeDBarChart {
                       height: 0.3
             }            
         };
-        let sp = new ShaderProgramm(this.element);
+        let sp = new ShaderProgramm(element);
         this.gl = sp.gl;
         this.shaderProgram = sp.shaderProgram;
         this.barArray = [];
         this.axisArray = [];
         this.animationOn = 0;
-        this.lastTime = 0;
         this.mvMatrix = mat4.create();
         mat4.identity(this.mvMatrix);
         mat4.translate(this.mvMatrix, [0.0, 0.0, -10.0]);        
@@ -35,13 +33,10 @@ class ThreeDBarChart {
         this.zRotation = 0;
         this.ch = new ClassHelper();
         this.ch.loadConfig(this.cfg, config);
-        this.animationSpeed = this.getAnimationSpeed();
-        let buffers = new Buffers(this.gl, this.shaderProgram);
         this.loadData(file);
-        this.element.onmousedown = () => {this.mouseDownEvent(event);};
-        this.element.onmouseup = () => {this.mouseUpEvent();};
+        element.onmousedown = () => {this.mouseDownEvent(event);};
+        element.onmouseup = () => {this.mouseUpEvent();};
         //this.element.oncontextmenu = () => {return false;};
-                             
     }
     
     getWidth() {
@@ -94,7 +89,7 @@ class ThreeDBarChart {
 
     loadData(file) {
         d3.json(file)
-          .then((d) => {this.data = d;this.initObject(d);});
+          .then((d) => {this.data = d;this.init(d);});
           //.catch((error) => {console.error('can not read file: ' + file + ' ' + new Error().stack);});        
     }    
     
@@ -105,7 +100,7 @@ class ThreeDBarChart {
         }
     }    
     
-    initObject(data) {
+    init(data) {
         let bc;
         let w = this.getWidth();
         let h = this.getHeight();
@@ -139,6 +134,8 @@ class ThreeDBarChart {
             axisZValue = axisZValue.concat(d3.keys(data[i])[0]);
         }
         
+        let buffers = new Buffers(this.gl, this.shaderProgram);
+        
         for (let i = 0; i < data.length; i++) {
             bc = data[i].color;
             for (let j = 0; j < d3.values(data[i])[0].length; j++) {
@@ -157,14 +154,15 @@ class ThreeDBarChart {
         this.drawScene();
     }
     
-    drawScene() {
-
+    drawScene() { 
+    
+        let k = 0;
         let w = this.getWidth();
         let d = this.getDepth();
-        let k = 0;                               
+        let animationSpeed = this.getAnimationSpeed();                               
 
         if (this.gl) {
-            mat4.rotate(this.mvMatrix, this.animationSpeed, [this.xRotation, 0, this.zRotation]);
+            mat4.rotate(this.mvMatrix, animationSpeed, [this.xRotation, 0, this.zRotation]);
             for (let i = 0; i < this.data.length; i++) {
                 for (let j = 0; j < d3.values(this.data[i])[0].length; j++) {
                     this.mvPushMatrix();

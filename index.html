@@ -3,19 +3,19 @@
     <head>
         <meta charset="utf-8">
         <title>WebGL Test</title>
-        <link rel="stylesheet" href="style.css"/>
-        <script src="glMatrix-0.9.5.min.js"></script>
-        <script src="webgl-utils.js"></script>
-        <script src="d3.v5.min.js"></script>                     
+        <link rel="stylesheet" href="./styles/style.css"/>
+        <script src="./lib/glMatrix-0.9.5.min.js"></script>
+        <script src="./lib/webgl-utils.js"></script>
+        <script src="./lib/d3.v5.min.js"></script>                     
         <script src="./script/global/ShaderProgramm.js"></script>
         <script src="./script/global/Shaders.js"></script>
         <script src="./script/global/Buffers.js"></script>
-        <script src="ClassHelper.js"></script>
-        <script src="CoordinatePlane.js"></script>
-        <script src="CoordinatePlaneText.js"></script>
-        <script src="ThreeDBar.js"></script>
-        <script src="Character.js"></script>
-        <script src="ThreeDBarChart.js"></script>        
+        <script src="./script/helpers/ClassHelper.js"></script>
+        <script src="./script/entity/CoordinatePlane.js"></script>
+        <script src="./script/entity/ThreeDBar.js"></script>
+        <script src="./script/entity/Character.js"></script>
+        <script src="./script/controllers/CoordinatePlaneText.js"></script>
+        <script src="./script/controllers/ThreeDBarChart.js"></script>        
      </head>
 <body>
 <div>
@@ -27,8 +27,8 @@
 </div>    
 </div>
     <script>
-        const bar1 = new ThreeDBarChart(document.querySelector('.barChart1'), {ledge: 0.2, animationSpeed: -0.05, text: {size: 28, width: 0.4}}, 'data1.json');
-        const bar2 = new ThreeDBarChart(document.querySelector('.barChart2'), {axisTicksCount: 7, ledge: 0.2, text: {color: '#0000f0'}}, 'data2.json');
+        const bar1 = new ThreeDBarChart(document.querySelector('.barChart1'), {ledge: 0.2, animationSpeed: -0.05, text: {size: 28, width: 0.4}}, './data/data1.json');
+        const bar2 = new ThreeDBarChart(document.querySelector('.barChart2'), {axisTicksCount: 7, ledge: 0.2, text: {color: '#0000f0'}}, './data/data2.json');
     </script>
 </body>
 </html>

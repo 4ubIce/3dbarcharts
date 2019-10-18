@@ -3,10 +3,10 @@ class Buffers {
 
     constructor(gl, sp) {
         this.cubeVertexNormalBuffer;
-        this.initBuffers(gl, sp);
+        this.init(gl, sp);
     }
 
-    initBuffers(gl, shaderProgram) {
+    init(gl, shaderProgram) {
         this.cubeVertexNormalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.cubeVertexNormalBuffer);
         var vertexNormals = [

@@ -23,7 +23,7 @@ class CoordinatePlane {
         this.mvMatrixStack = [];
         this.ch = new ClassHelper();
         this.ch.loadConfig(this.cfg, config);        
-        this.initBuffers();
+        this.init();
     }
     
     getX() {
@@ -73,7 +73,11 @@ class CoordinatePlane {
     getyRotation() {
         return this.cfg.yRotation;
     }           
-
+    
+    init() {
+        this.initBuffers();
+    }
+    
     draw() {
         this.drawScene();
     }

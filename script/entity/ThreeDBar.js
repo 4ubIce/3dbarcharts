@@ -17,12 +17,16 @@ class ThreeDBar {
         this.mvMatrixStack = [];
         this.ch = new ClassHelper();
         this.ch.loadConfig(this.cfg, config);        
-        this.initBuffers(this.cfg.width / 2, this.cfg.height);
-        this.initTexture();        
+        this.init();
     }
     
     getBarColor() {
         return this.hexToRgb(this.cfg.barColor, 1);
+    }
+    
+    init() {
+        this.initBuffers(this.cfg.width / 2, this.cfg.height);
+        this.initTexture();    
     }
     
     draw() {
