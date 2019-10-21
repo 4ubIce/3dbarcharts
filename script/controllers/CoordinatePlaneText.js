@@ -174,7 +174,7 @@ class CoordinatePlaneText {
 
         this.axisPlane = new CoordinatePlane(this.gl, this.shaderProgram, this.mvMatrix,
                                {x: 0, y: 0, z: 0, width: width, height: height,
-                                xTicksCount: xTicksCount, yTicksCount: yTicksCount, tickStep: ylp, ledge: ledge});
+                                xTicksCount: xTicksCount, yTicksCount: yTicksCount, tickStep: ylp, ledge: ledge}).init();
 
         for (let i = 0; i < posX * yTicksCount + posY * xTicksCount; i++) {
             xTexture = posX * (width + ledge) + posY * (i * xlp - textWidth / 2 + offset);
@@ -183,9 +183,10 @@ class CoordinatePlaneText {
             let axisChar = new Character(this.gl, this.shaderProgram, this.mvMatrix,
                                   {x: xTexture, y: yTexture, z: zTexture,
                                    text: {text: t[i], size: textSize, font: textFont, color: textColor, width: textWidth, height: textHeight},
-                                   rotate: textRotate, xRotation: textxRotation, yRotation: textyRotation, zRotation: textzRotation});
+                                   rotate: textRotate, xRotation: textxRotation, yRotation: textyRotation, zRotation: textzRotation}).init();
             this.axisChars.push(axisChar);
         }
+        return this;
     }
     
     draw() {

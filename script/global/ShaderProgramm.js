@@ -1,9 +1,14 @@
 ﻿'use strict';
 class ShaderProgramm {
 
-    constructor(element) {
+    constructor() {
+        this.gl;
+        this.shaderProgram;
+    }
+    
+    init(element) {
         this.gl = this.initGL(element);
-        this.shaderProgram = this.initShaderProgram(this.gl);
+        this.shaderProgram = this.initShaderProgramm(this.gl);
     }
     
     initGL(canvas) {
@@ -27,7 +32,7 @@ class ShaderProgramm {
         return gl;
     }
 
-    initShaderProgram(gl) { 
+    initShaderProgramm(gl) { 
                            
         let shaders = new Shaders();
         let fragmentShader = shaders.getShader('shader-fs', gl);

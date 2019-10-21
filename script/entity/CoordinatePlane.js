@@ -22,7 +22,6 @@ class CoordinatePlane {
         this.pMatrix = mat4.create();
         this.ch = new ClassHelper();
         this.ch.loadConfig(this.cfg, config);        
-        this.init();
     }
     
     getX() {
@@ -75,10 +74,7 @@ class CoordinatePlane {
     
     init() {
         this.initBuffers();
-    }
-    
-    draw() {
-        this.drawScene();
+        return this;
     }
 
     initBuffers() {
@@ -131,7 +127,7 @@ class CoordinatePlane {
         this.lineVertexIndexBuffer.numItems = 2 * (xTicksCount + yTicksCount); 
     }
 
-    drawScene() { 
+    draw() { 
         
         mat4.perspective(45, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
 

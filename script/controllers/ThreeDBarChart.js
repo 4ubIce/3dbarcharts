@@ -19,7 +19,8 @@ class ThreeDBarChart {
                       height: 0.3
             }            
         };
-        let sp = new ShaderProgramm(element);
+        let sp = new ShaderProgramm();
+        sp.init(element);
         this.gl = sp.gl;
         this.shaderProgram = sp.shaderProgram;
         this.barArray = [];
@@ -96,7 +97,7 @@ class ThreeDBarChart {
     tick() {
         if (this.animationOn == 1) {
             requestAnimFrame(() => {this.tick();});
-            this.drawScene();
+            this.draw();
         }
     }    
     
@@ -140,7 +141,7 @@ class ThreeDBarChart {
             bc = data[i].color;
             for (let j = 0; j < d3.values(data[i])[0].length; j++) {
                 let bar = new ThreeDBar(this.gl, this.shaderProgram, this.mvMatrix,
-                                 {height: yScale(d3.values(data[i])[0][j].Value), barColor: bc});
+                                 {height: yScale(d3.values(data[i])[0][j].Value), barColor: bc}).init();
                 this.barArray.push(bar);
             };
         };
@@ -149,25 +150,25 @@ class ThreeDBarChart {
                              {x: -w / 2, y: -d, z: 0, width: w, height: d,
                               xTicksCount: this.maxColumnCount, yTicksCount: this.rowCount,
                               tickStep: d / (this.rowCount - 1), ledge: l, rotate: 90, xRotation: 1,
-                              text: {text: axisXValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: 180, xRotation: 1}});
+                              text: {text: axisXValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: 180, xRotation: 1}}).init();
         this.axisArray.push(axisX);
         const axisY = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix,
                              {x: -w / 2, y: -1, z: -l, width: w, height: 1 + yScale(maxValue),
                               xTicksCount: this.maxColumnCount, yTicksCount: axisTicksCount,
                               tickStep: tickStep, ledge: l,
-                              text: {text: axisYValue, size: ts, font: tf, color: tc, width: tw, height: th}});     
+                              text: {text: axisYValue, size: ts, font: tf, color: tc, width: tw, height: th}}).init();     
         this.axisArray.push(axisY);
         const axisZ = new CoordinatePlaneText(this.gl, this.shaderProgram, this.mvMatrix,
                              {x: -w / 2 - l, y: -1, z: 0, width: d, height: 1 + yScale(maxValue),
                               xTicksCount: this.rowCount, yTicksCount: axisTicksCount,
                               tickStep: tickStep, ledge: l, rotate: -90, yRotation: 1,
-                              text: {text: axisZValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: -180, yRotation: 1, offset: this.getTextWidth()}});     
+                              text: {text: axisZValue, size: ts, font: tf, color: tc, width: tw, height: th, position: 'y', rotate: -180, yRotation: 1, offset: this.getTextWidth()}}).init();     
         this.axisArray.push(axisZ);
         
-        this.drawScene();
+        this.draw();
     }
     
-    drawScene() { 
+    draw() { 
     
         let k = 0;
         let w = this.getWidth();

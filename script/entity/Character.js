@@ -26,7 +26,6 @@ class Character {
         this.pMatrix = mat4.create();
         this.ch = new ClassHelper();
         this.ch.loadConfig(this.cfg, config);        
-        this.init();
     }
     
     getX() {
@@ -84,11 +83,8 @@ class Character {
     init() {
         this.initTextCanvas();
         this.initTexture();
-        this.initBuffers();    
-    }
-    
-    draw() {
-        this.drawScene();
+        this.initBuffers();
+        return this;    
     }
 
     initTextCanvas() {
@@ -175,7 +171,7 @@ class Character {
         this.lineVertexIndexBuffer.numItems = 4;                 
     }
 
-    drawScene() { 
+    draw() { 
 
         let x = this.getX();
         let y = this.getY();

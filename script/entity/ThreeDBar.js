@@ -16,7 +16,6 @@ class ThreeDBar {
         this.pMatrix = mat4.create();
         this.ch = new ClassHelper();
         this.ch.loadConfig(this.cfg, config);        
-        this.init();
     }
     
     getBarColor() {
@@ -25,13 +24,11 @@ class ThreeDBar {
     
     init() {
         this.initBuffers(this.cfg.width / 2, this.cfg.height);
-        this.initTexture();    
+        this.initTexture();
+        this.initVariables();
+        return this;    
     }
     
-    draw() {
-        this.drawScene();
-    }
-
     initBuffers(width, height) { 
     
         let barColor = this.getBarColor();
@@ -115,8 +112,33 @@ class ThreeDBar {
         
         this.gl.bindTexture(this.gl.TEXTURE_2D, null);      
     }    
+       
+    initVariables() {
+        this.gl.uniform3f(
+          this.shaderProgram.ambientColorUniform,
+          parseFloat("0.2"),
+          parseFloat("0.2"),
+          parseFloat("0.2")
+        );
+        let lightingDirection = [
+          parseFloat("0.0"),
+          parseFloat("0.0"),
+          parseFloat("-1.0")
+        ];
+        let adjustedLD = vec3.create();
+        vec3.normalize(lightingDirection, adjustedLD);
+        vec3.scale(adjustedLD, -2);
+        this.gl.uniform3fv(this.shaderProgram.lightingDirectionUniform, adjustedLD);
 
-    drawScene() {
+        this.gl.uniform3f(
+          this.shaderProgram.directionalColorUniform,
+          parseFloat("0.8"),
+          parseFloat("0.8"),
+          parseFloat("0.8")
+        );    
+    }
+    
+    draw() {
     
         let whiteColor = new Float32Array([1, 1, 1, 1]);
         let blackColor = new Float32Array([0, 0, 0, 1]);    
@@ -133,29 +155,6 @@ class ThreeDBar {
         this.gl.uniform4fv(this.shaderProgram.vColor1, blackColor);
         this.gl.uniform4fv(this.shaderProgram.vColor2, whiteColor);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.whiteTexture);        
-
-        this.gl.uniform3f(
-          this.shaderProgram.ambientColorUniform,
-          parseFloat("0.2"),
-          parseFloat("0.2"),
-          parseFloat("0.2")
-        );
-        var lightingDirection = [
-          parseFloat("0.0"),
-          parseFloat("0.0"),
-          parseFloat("-1.0")
-        ];
-        var adjustedLD = vec3.create();
-        vec3.normalize(lightingDirection, adjustedLD);
-        vec3.scale(adjustedLD, -2);
-        this.gl.uniform3fv(this.shaderProgram.lightingDirectionUniform, adjustedLD);
-
-        this.gl.uniform3f(
-          this.shaderProgram.directionalColorUniform,
-          parseFloat("0.8"),
-          parseFloat("0.8"),
-          parseFloat("0.8")
-        );
             
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.cubeVertexIndexBuffer);
         this.setMatrixUniforms();
