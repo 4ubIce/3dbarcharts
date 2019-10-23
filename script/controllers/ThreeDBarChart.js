@@ -142,7 +142,7 @@ define('ThreeDBarChart', ['ShaderProgramm', 'ClassHelper', 'ThreeDBar',
                 axisZValue = axisZValue.concat(d3.keys(data[i])[0]);
             }
             
-            let buffers = new Buffers(this.gl, this.shaderProgram);
+            //let buffers = new Buffers(this.gl, this.shaderProgram);
             
             for (let i = 0; i < data.length; i++) {
                 bc = data[i].color;
