@@ -3,29 +3,17 @@
     <head>
         <meta charset="utf-8">
         <title>WebGL Test</title>
-        <link rel="stylesheet" href="style.css"/>
-        <script src="glMatrix-0.9.5.min.js"></script>
-        <script src="webgl-utils.js"></script>
-        <script src="d3.v5.min.js"></script>
-        <script src="ClassHelper.js"></script>
-        <script src="CoordinatePlane.js"></script>
-        <script src="CoordinatePlaneText.js"></script>
-        <script src="ThreeDBar.js"></script>
-        <script src="Character.js"></script>
-        <script src="ThreeDBarChart.js"></script>        
+        <link rel="stylesheet" href="./styles/style.css"/>
+        <script data-main="main" src="lib/require.js"></script>
      </head>
 <body>
-<div>
-<div>
-    <canvas class="barChart1" style="border: none;" width="600" height="500"></canvas>
-</div>
-<div>    
-    <canvas class="barChart2" style="border: none;" width="600" height="500"></canvas>
-</div>    
-</div>
-    <script>
-        const bar1 = new ThreeDBarChart(document.querySelector('.barChart1'), {ledge: 0.2}, 'data1.json');
-        const bar2 = new ThreeDBarChart(document.querySelector('.barChart2'), {axisTicksCount: 7, ledge: 0.2, text: {color: '#0000f0'}}, 'data2.json');
-    </script>
+    <div>
+        <div>
+            <canvas class="barChart1" style="border: none;" width="600" height="500"></canvas>
+        </div>
+        <div>    
+            <canvas class="barChart2" style="border: none;" width="600" height="500"></canvas>
+        </div>    
+    </div>
 </body>
 </html>

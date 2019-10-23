@@ -1,0 +1,53 @@
+﻿[
+  {"color": "#ff0000",
+  "2017":
+    [
+      {"Params": "Янв", "Value": 35},
+      {"Params": "Фев ", "Value": 12},
+      {"Params": "Мар", "Value": 5},
+      {"Params": "Апр", "Value": 56},
+      {"Params": "Май", "Value": 58},
+      {"Params": "Июн", "Value": 78},
+      {"Params": "Июл", "Value": 59},
+      {"Params": "Авг", "Value": 26},
+      {"Params": "Сен", "Value": 8},
+      {"Params": "Окт", "Value": 24},
+      {"Params": "Ноя", "Value": 38},
+      {"Params": "Дек", "Value": 16}
+    ]
+  },
+  {"color": "#00ff00",
+  "2018":
+    [
+      {"Params": "Янв", "Value": 9},
+      {"Params": "Фев", "Value": 4},
+      {"Params": "Мар", "Value": 15},
+      {"Params": "Апр", "Value": 62},
+      {"Params": "Май", "Value": 32},
+      {"Params": "Июн", "Value": 40},
+      {"Params": "Июл", "Value": 7},
+      {"Params": "Авг", "Value": 34},
+      {"Params": "Сен", "Value": 15},
+      {"Params": "Окт", "Value": 7},
+      {"Params": "Ноя", "Value": 19},
+      {"Params": "Дек", "Value": 53}                  
+    ]
+  },
+  {"color": "#0000ff",
+  "2019":
+    [
+      {"Params": "Янв", "Value": 19},
+      {"Params": "Фев", "Value": 54},
+      {"Params": "Мар", "Value": 32},
+      {"Params": "Апр", "Value": 21},
+      {"Params": "Май", "Value": 35},
+      {"Params": "Июн", "Value": 62},
+      {"Params": "Июл", "Value": 42},
+      {"Params": "Авг", "Value": 6},
+      {"Params": "Сен", "Value": 43},
+      {"Params": "Окт", "Value": 52},
+      {"Params": "Ноя", "Value": 24},
+      {"Params": "Дек", "Value": 13}
+    ]
+  }    
+]
