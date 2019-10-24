@@ -29,7 +29,6 @@ define('ThreeDBar', ['ClassHelper'], function(ClassHelper) {
         init: function () {
             this.initBuffers(this.cfg.width / 2, this.cfg.height);
             this.initTexture();
-            this.initVariables();
             return this;    
         },
         
@@ -105,49 +104,6 @@ define('ThreeDBar', ['ClassHelper'], function(ClassHelper) {
             this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), this.gl.STATIC_DRAW);
             this.cubeVertexIndexBuffer.itemSize = 1;
             this.cubeVertexIndexBuffer.numItems = 36;
-            
-            this.cubeVertexNormalBuffer = this.gl.createBuffer();
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexNormalBuffer);
-            var vertexNormals = [
-              // Front face
-               0.0,  0.0,  1.0,
-               0.0,  0.0,  1.0,
-               0.0,  0.0,  1.0,
-               0.0,  0.0,  1.0,
-
-              // Back face
-               0.0,  0.0, -1.0,
-               0.0,  0.0, -1.0,
-               0.0,  0.0, -1.0,
-               0.0,  0.0, -1.0,
-
-              // Top face
-               0.0,  1.0,  0.0,
-               0.0,  1.0,  0.0,
-               0.0,  1.0,  0.0,
-               0.0,  1.0,  0.0,
-
-              // Bottom face
-               0.0, -1.0,  0.0,
-               0.0, -1.0,  0.0,
-               0.0, -1.0,  0.0,
-               0.0, -1.0,  0.0,
-
-              // Right face
-               1.0,  0.0,  0.0,
-               1.0,  0.0,  0.0,
-               1.0,  0.0,  0.0,
-               1.0,  0.0,  0.0,
-
-              // Left face
-              -1.0,  0.0,  0.0,
-              -1.0,  0.0,  0.0,
-              -1.0,  0.0,  0.0,
-              -1.0,  0.0,  0.0,
-            ];
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertexNormals), this.gl.STATIC_DRAW);
-            this.cubeVertexNormalBuffer.itemSize = 3;
-            this.cubeVertexNormalBuffer.numItems = 24;                
         },
         
         initTexture: function () {
@@ -160,31 +116,6 @@ define('ThreeDBar', ['ClassHelper'], function(ClassHelper) {
             this.gl.bindTexture(this.gl.TEXTURE_2D, null);      
         },    
            
-        initVariables: function () {
-            this.gl.uniform3f(
-              this.shaderProgram.ambientColorUniform,
-              parseFloat("0.2"),
-              parseFloat("0.2"),
-              parseFloat("0.2")
-            );
-            let lightingDirection = [
-              parseFloat("0.0"),
-              parseFloat("0.0"),
-              parseFloat("-1.0")
-            ];
-            let adjustedLD = vec3.create();
-            vec3.normalize(lightingDirection, adjustedLD);
-            vec3.scale(adjustedLD, -2);
-            this.gl.uniform3fv(this.shaderProgram.lightingDirectionUniform, adjustedLD);
-
-            this.gl.uniform3f(
-              this.shaderProgram.directionalColorUniform,
-              parseFloat("0.8"),
-              parseFloat("0.8"),
-              parseFloat("0.8")
-            );    
-        },
-        
         draw: function () {
         
             let whiteColor = new Float32Array([1, 1, 1, 1]);
@@ -196,11 +127,7 @@ define('ThreeDBar', ['ClassHelper'], function(ClassHelper) {
             this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.cubeVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexColorBuffer);
             this.gl.vertexAttribPointer(this.shaderProgram.vertexColorAttribute, this.cubeVertexColorBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
-    //        this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, this.cubeVertexNormalBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
-    
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexNormalBuffer);
-            this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, this.cubeVertexNormalBuffer.itemSize, this.gl.FLOAT, false, 0, 0);    
-                    
+                                                                                                  
             this.gl.vertexAttribPointer(this.shaderProgram.textureCoordAttribute, 1, this.gl.FLOAT, false, 0, 0);
             this.gl.uniform4fv(this.shaderProgram.vColor1, blackColor);
             this.gl.uniform4fv(this.shaderProgram.vColor2, whiteColor);

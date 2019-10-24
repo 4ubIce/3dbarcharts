@@ -108,6 +108,31 @@ define('ThreeDBarChart', ['ShaderProgramm', 'ClassHelper', 'ThreeDBar',
             }
         },    
         
+        initVariables: function () {
+            this.gl.uniform3f(
+              this.shaderProgram.ambientColorUniform,
+              parseFloat("0.2"),
+              parseFloat("0.2"),
+              parseFloat("0.2")
+            );
+            let lightingDirection = [
+              parseFloat("0.0"),
+              parseFloat("0.0"),
+              parseFloat("-1.0")
+            ];
+            let adjustedLD = vec3.create();
+            vec3.normalize(lightingDirection, adjustedLD);
+            vec3.scale(adjustedLD, -2);
+            this.gl.uniform3fv(this.shaderProgram.lightingDirectionUniform, adjustedLD);
+
+            this.gl.uniform3f(
+              this.shaderProgram.directionalColorUniform,
+              parseFloat("0.8"),
+              parseFloat("0.8"),
+              parseFloat("0.8")
+            );    
+        },          
+        
         init: function (data) {
             let bc;
             let w = this.getWidth();
@@ -142,7 +167,8 @@ define('ThreeDBarChart', ['ShaderProgramm', 'ClassHelper', 'ThreeDBar',
                 axisZValue = axisZValue.concat(d3.keys(data[i])[0]);
             }
             
-            //let buffers = new Buffers(this.gl, this.shaderProgram);
+            this.initVariables();
+            this.buffers = new Buffers(this.gl, this.shaderProgram);
             
             for (let i = 0; i < data.length; i++) {
                 bc = data[i].color;
@@ -176,12 +202,14 @@ define('ThreeDBarChart', ['ShaderProgramm', 'ClassHelper', 'ThreeDBar',
         },
         
         draw: function () { 
-        
+            
             let k = 0;
             let w = this.getWidth();
             let d = this.getDepth();
-            let animationSpeed = this.getAnimationSpeed();                               
-
+            let animationSpeed = this.getAnimationSpeed();
+                                           
+            this.buffers.init();
+            
             if (this.gl) {
                 mat4.rotate(this.mvMatrix, animationSpeed, [this.xRotation, 0, this.zRotation]);
                 for (let i = 0; i < this.data.length; i++) {
