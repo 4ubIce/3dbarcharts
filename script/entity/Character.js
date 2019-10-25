@@ -194,6 +194,9 @@ define('Character', ['ClassHelper'], function(ClassHelper) {
             mat4.translate(this.mvMatrix, [x, y, z]);        
             mat4.rotate(this.mvMatrix, rotate, [xRotation, yRotation, zRotation]);
             
+            this.gl.enableVertexAttribArray(this.shaderProgram.textureCoordAttribute);
+            this.gl.disableVertexAttribArray(this.shaderProgram.vertexNormalAttribute);            
+            
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexPositionBuffer);
             this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.squareVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.squareVertexTextureCoordBuffer);

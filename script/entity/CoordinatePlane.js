@@ -135,14 +135,16 @@ define('CoordinatePlane', ['ClassHelper'], function(ClassHelper) {
             
             mat4.perspective(45, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
 
+            this.gl.disableVertexAttribArray(this.shaderProgram.vertexNormalAttribute);
+            this.gl.disableVertexAttribArray(this.shaderProgram.textureCoordAttribute);
+            //this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, 1, this.gl.FLOAT, false, 0, 0);
+            //this.gl.vertexAttribPointer(this.shaderProgram.textureCoordAttribute, 1, this.gl.FLOAT, false, 0, 0);
+            
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexPositionBuffer);
             this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.cubeVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
             
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cubeVertexColorBuffer);
             this.gl.vertexAttribPointer(this.shaderProgram.vertexColorAttribute, this.cubeVertexColorBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
-            
-            this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, 1, this.gl.FLOAT, false, 0, 0);
-            this.gl.vertexAttribPointer(this.shaderProgram.textureCoordAttribute, 1, this.gl.FLOAT, false, 0, 0);
             
             this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.lineVertexIndexBuffer);
             
