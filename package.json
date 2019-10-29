@@ -1,0 +1,10 @@
+﻿{
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "amd-loader": "0.0.8",
+    "jasmine": "^3.5.0",
+    "requirejs": "^2.3.6"
+  }
+}

@@ -1,3 +1,5 @@
+spec/
+node_modules/
 /nbproject/private/
 .idea/
 target/

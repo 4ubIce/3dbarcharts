@@ -229,7 +229,7 @@ define('ThreeDBarChart', ['ShaderProgramm', 'ClassHelper', 'ThreeDBar',
                     this.axisArray[i].draw();
                     this.mvMatrix = this.ms.pop();
                 }
-            }                        
+            }
         },
         
         mouseDownEvent: function (e) {
