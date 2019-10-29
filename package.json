@@ -1,9 +1,10 @@
-﻿{
+{
   "scripts": {
     "test": "mocha"
   },
   "dependencies": {
     "amd-loader": "0.0.8",
+    "gl-matrix": "^3.1.0",
     "jasmine": "^3.5.0",
     "requirejs": "^2.3.6"
   }

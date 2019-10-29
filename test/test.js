@@ -1,6 +1,7 @@
 ﻿'use strict';
 
 require('amd-loader');
+
 let assert = require('assert');
 let requirejs = require('requirejs');
 requirejs.config({
@@ -27,8 +28,6 @@ describe('MatrixStack', function() {
 
     let MatrixStack = requirejs('MatrixStack');
     let stack = new MatrixStack();
-    
-    
 
     describe('new MatrixStack()', function() {
         it('should contain empty array', function() {
@@ -36,5 +35,22 @@ describe('MatrixStack', function() {
         });
     });
     
+    describe('MatrixStack().push(matrix)', function() {
 
+        let mat = require('gl-Matrix');
+        let m = mat.mat4.create();
+
+        it('should push matrix into array', function() {
+            stack.push(m);
+            assert(stack.matrixStack.length > 0);
+        });
+    });
+    
+    describe('MatrixStack().pop()', function() {
+        it('should return matrix and remove element from array', function() {
+            let m = stack.pop();
+            assert.equal(stack.matrixStack.length, 0);
+            assert.equal(m.length, 16);
+        });
+    });        
 });
