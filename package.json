@@ -1,11 +1,14 @@
-{
+﻿{
   "scripts": {
-    "test": "mocha"
+    "test": "jasmine --random=false"
   },
   "dependencies": {
     "amd-loader": "0.0.8",
     "gl-matrix": "^3.1.0",
-    "jasmine": "^3.5.0",
+    "jsdom": "^15.2.0",
     "requirejs": "^2.3.6"
+  },
+  "devDependencies": {
+    "jasmine": "^3.5.0"
   }
 }
