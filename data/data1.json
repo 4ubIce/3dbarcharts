@@ -1,5 +1,5 @@
 ﻿[
-  {"color": "#ff0000",
+  {
   "2017":
     [
       {"Params": "Янв", "Value": 35},
@@ -14,9 +14,10 @@
       {"Params": "Окт", "Value": 24},
       {"Params": "Ноя", "Value": 38},
       {"Params": "Дек", "Value": 16}
-    ]
+    ],
+  "color": "#ff0000"
   },
-  {"color": "#00ff00",
+  {
   "2018":
     [
       {"Params": "Янв", "Value": 9},
@@ -31,9 +32,10 @@
       {"Params": "Окт", "Value": 7},
       {"Params": "Ноя", "Value": 19},
       {"Params": "Дек", "Value": 53}                  
-    ]
+    ],
+  "color": "#00ff00"
   },
-  {"color": "#0000ff",
+  {
   "2019":
     [
       {"Params": "Янв", "Value": 19},
@@ -48,6 +50,7 @@
       {"Params": "Окт", "Value": 52},
       {"Params": "Ноя", "Value": 24},
       {"Params": "Дек", "Value": 13}
-    ]
+    ],
+  "color": "#0000ff"
   }    
 ]

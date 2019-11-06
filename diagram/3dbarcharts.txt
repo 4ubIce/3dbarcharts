@@ -1,0 +1,142 @@
+@startuml
+
+package file <<Database>> {
+    }
+
+class ThreeDBarChart #00af00 {
+    cfg: object
+    gl: ShaderProgramm.gl
+    shaderProgram: ShaderProgramm.shaderProgram
+    barArray: ThreeDBar[]
+    axisArray: CoordinatePlaneText[]
+    ...
+    constructor(element, config, file)
+    getWidth()
+    getHeight()
+    getDepth()
+    ...()
+    init()
+    draw()
+}
+
+class CoordinatePlaneText #00af00 {
+    cfg: object
+    gl: ShaderProgramm.gl
+    shaderProgram: ShaderProgramm.shaderProgram
+    axisPlane: CoordinatePlane
+    axisChars: Character[]
+    ...
+    constructor(element, config, file)
+    getWidth()
+    getHeight()
+    getDepth()
+    ...()
+    init()
+    draw()
+}
+
+class ThreeDBar {
+    cfg: object
+    gl: ShaderProgramm.gl
+    shaderProgram: ShaderProgramm.shaderProgram
+    ...
+    constructor(gl, shaderProgram, mvMatrix, config)
+    getBarColor()
+    init()
+    draw()
+    ...()
+}
+
+class CoordinatePlane {
+    cfg: object
+    gl: ShaderProgramm.gl
+    shaderProgram: ShaderProgramm.shaderProgram
+    ...
+    constructor(gl, shaderProgram, mvMatrix, config)
+    getX()
+    getY()
+    getZ()
+    getHeight()
+    getWidth()
+    ...()
+    init()
+    draw()
+    ...()
+}
+
+class Character {
+    cfg: object
+    gl: ShaderProgramm.gl
+    shaderProgram: ShaderProgramm.shaderProgram
+    canvas: object
+    ...
+    constructor(gl, shaderProgram, mvMatrix, config)
+    getX()
+    getY()
+    getZ()
+    getHeight()
+    getWidth()
+    getText()
+    ...()
+    init()
+    draw()
+    ...()
+}
+
+class ShaderProgramm {
+    gl: object
+    shaderProgram: object
+    constructor()
+    init()
+}
+
+class ClassHelper {
+    constructor()
+    loadConfig(cfg, config)
+}
+
+class MatrixStack {
+    matrixStack[]: array
+    constructor()
+    push(matrix: mat4)
+    pop()
+}
+
+class Buffers {
+    gl: object
+    shaderProgram: ShaderProgramm.shaderProgram
+    cubeVertexNormalBuffer: object
+    constructor(gl, ShaderProgramm)
+    init()
+}
+
+class Shaders {
+    constructor()
+    getShader(id, gl)
+}
+
+file -> ThreeDBarChart : data
+CoordinatePlaneText ---* ThreeDBarChart
+ThreeDBar ---* ThreeDBarChart
+Buffers ---* ThreeDBarChart
+ShaderProgramm ---* ThreeDBarChart
+ClassHelper ---* ThreeDBarChart
+MatrixStack ---* ThreeDBarChart
+CoordinatePlane ---* CoordinatePlaneText
+Character ---* CoordinatePlaneText
+ShaderProgramm ---* CoordinatePlaneText
+ClassHelper ---* CoordinatePlaneText
+MatrixStack ---* CoordinatePlaneText
+ClassHelper ---* Character
+ClassHelper ---* CoordinatePlane
+ClassHelper ---* ThreeDBar
+Shaders ---* ShaderProgramm
+
+
+skinparam class {
+	backgroundColor DarkKhaki
+}
+
+skinparam databaseBackgroundColor Aqua
+
+@enduml
