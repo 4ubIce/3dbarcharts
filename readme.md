@@ -1,3 +1,5 @@
+* class diagramm: .diagram/3dbarcharts.png
+
 * Main page http://127.0.0.1:8080/3dbarcharts/
 
 * Jasmine js tests page http://127.0.0.1:8080/3dbarcharts/test.html?random=false
