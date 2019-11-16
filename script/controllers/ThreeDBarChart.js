@@ -39,8 +39,8 @@ define('ThreeDBarChart', ['ShaderProgramm', 'ClassHelper', 'ThreeDBar', 'Coordin
     this.zRotation = 0;
     this.ch = new ClassHelper();
     this.ch.loadConfig(this.cfg, config);
-    this.loadData(file);
     this.ms = new MatrixStack();
+    this.loadData(file);
 
     element.onmousedown = function (event) {
       _this.mouseDownEvent(event);

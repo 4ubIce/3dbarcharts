@@ -6,7 +6,7 @@ const presets = [
         edge: "10",
         firefox: "21",
         chrome: "23",
-        safari: "6",
+        safari: "6"
       },
       useBuiltIns: "usage",
     },

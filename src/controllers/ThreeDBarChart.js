@@ -36,8 +36,8 @@ define('ThreeDBarChart', ['ShaderProgramm', 'ClassHelper', 'ThreeDBar',
         this.zRotation = 0;
         this.ch = new ClassHelper();
         this.ch.loadConfig(this.cfg, config);
+        this.ms = new MatrixStack();
         this.loadData(file);
-        this.ms = new MatrixStack(); 
         element.onmousedown = (event) => {this.mouseDownEvent(event);};
         element.onmouseup = () => {this.mouseUpEvent();};
         //this.element.oncontextmenu = () => {return false;};
