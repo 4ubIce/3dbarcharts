@@ -75,6 +75,14 @@ requirejs(['ThreeDBarChart'], function(ThreeDBarChart) {
             return result;            
         }
         
+        function getBarCount(d) {
+            let result = 0;
+            for (let i = 0; i < d.length; i++) {
+                result = result + d[i][Object.keys(d[i])[0]].length;
+            };
+            return result;            
+        }        
+        
         //let file = './data/data1.json';
         let l = 0.2;
         let as = -0.05;
@@ -139,6 +147,7 @@ requirejs(['ThreeDBarChart'], function(ThreeDBarChart) {
                   ];
         let rowCount = getRowCount(d);
         let maxBarCountByRow = Math.max.apply(Math, getBarCountByRow(d));
+        let barCount = getBarCount(d);
         let barChart = new MyThreeDBarChart(document.querySelector('.barChart1'), {ledge: l, animationSpeed: as, text: {size: ts, width: tw}}, d);
 
         describe('new ThreeDBarChart()', function() {
@@ -165,7 +174,20 @@ requirejs(['ThreeDBarChart'], function(ThreeDBarChart) {
             });
         });
         
-        
+        describe('ThreeDBarChart().barArray', function() {
+            it('barArray.length should be ' + barCount, function() {
+                expect(barChart.barArray.length).toEqual(barCount);
+            });
+            it('barArray[5] color should be red', function() {
+                expect(barChart.barArray[5].cfg.barColor).toEqual('#ff0000');
+            });
+            it('barArray[17] color should be green', function() {
+                expect(barChart.barArray[17].cfg.barColor).toEqual('#00ff00');
+            });
+            it('barArray[29] color should be blue', function() {
+                expect(barChart.barArray[29].cfg.barColor).toEqual('#0000ff');
+            });                                    
+        });        
               
     });
 });
