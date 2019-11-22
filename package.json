@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "test": "jasmine --random=false"
+    "test": "jasmine --random=false",
+    "build": "babel src -d build"
   },
   "dependencies": {
     "@babel/polyfill": "^7.6.0",
@@ -15,6 +16,8 @@
     "@babel/core": "^7.6.4",
     "@babel/preset-env": "^7.7.0",
     "@babel/preset-es2015": "^7.0.0-beta.53",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
     "jasmine": "^3.5.0"
   }
 }

@@ -49,7 +49,7 @@ requirejs(['MatrixStack', 'glMatrix'], function(MatrixStack) {
         });
     });
 });
-requirejs(['ThreeDBarChart'], function(ThreeDBarChart) {
+requirejs(['ThreeDBarChart', 'ThreeDBar'], function(ThreeDBarChart, ThreeDBar) {
     describe('ThreeDBarChart', function() {
     
         class MyThreeDBarChart extends ThreeDBarChart {
@@ -149,11 +149,30 @@ requirejs(['ThreeDBarChart'], function(ThreeDBarChart) {
         let maxBarCountByRow = Math.max.apply(Math, getBarCountByRow(d));
         let barCount = getBarCount(d);
         let barChart = new MyThreeDBarChart(document.querySelector('.barChart1'), {ledge: l, animationSpeed: as, text: {size: ts, width: tw}}, d);
-
+        let gl = barChart.gl;
+        let sp = barChart.shaderProgram;
+        let mvMatrix = barChart.mvMatrix;
+        let bar = new ThreeDBar(gl, sp, mvMatrix, {});
+        
         describe('new ThreeDBarChart()', function() {
             it('should be defined', function() {
-              expect(barChart).toBeDefined();
+                expect(barChart).toBeDefined();
             });
+            it('ThreeDBarChart().gl should be defined', function() {
+               expect(barChart.gl).toBeDefined();
+            });
+            it('ThreeDBarChart().shaderProgram should be defined', function() {
+                expect(barChart.shaderProgram).toBeDefined();
+            });
+            it('ThreeDBarChart().сlassHelper should be defined', function() {
+                expect(barChart.ch).toBeDefined();
+            }); 
+            it('ThreeDBarChart().matrixStack should be defined', function() {
+               expect(barChart.ms).toBeDefined();
+            });
+            it('ThreeDBarChart().mvMatrix should be defined', function() {
+               expect(barChart.mvMatrix).toBeDefined();
+            });                                                             
         });
          
         describe('ThreeDBarChart().loadConfig()', function() {
@@ -168,9 +187,11 @@ requirejs(['ThreeDBarChart'], function(ThreeDBarChart) {
         describe('ThreeDBarChart().axisArray', function() {
             it('axisArray[0] (axisX) should include ' + maxBarCountByRow + ' "X" ticks count', function() {
                 expect(barChart.axisArray[0].getxTicksCount()).toEqual(maxBarCountByRow);
+                expect(barChart.axisArray[0].getxTicksCount()).toEqual(barChart.maxColumnCount);
             });
             it('axisArray[0] (axisX) should include ' + rowCount + ' "Y" ticks count', function() {
                 expect(barChart.axisArray[0].getyTicksCount()).toEqual(rowCount);
+                expect(barChart.axisArray[0].getyTicksCount()).toEqual(barChart.rowCount);
             });
         });
         
@@ -187,7 +208,19 @@ requirejs(['ThreeDBarChart'], function(ThreeDBarChart) {
             it('barArray[29] color should be blue', function() {
                 expect(barChart.barArray[29].cfg.barColor).toEqual('#0000ff');
             });                                    
-        });        
+        });
+        
+        describe('new ThreeDBar()', function() {
+            it('should be defined', function() {
+               expect(bar).toBeDefined();
+            });
+            bar.init();
+            it('ThreeDBar().init() should be initialize buffer and textures', function() {
+               expect(bar.cubeVertexPositionBuffer).toBeDefined();
+               expect(bar.whiteTexture).toBeDefined();
+            });                                                           
+                                                           
+        });                
               
     });
 });
