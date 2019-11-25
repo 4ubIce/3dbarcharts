@@ -218,8 +218,13 @@ requirejs(['ThreeDBarChart', 'ThreeDBar'], function(ThreeDBarChart, ThreeDBar) {
             it('ThreeDBar().init() should be initialize buffer and textures', function() {
                expect(bar.cubeVertexPositionBuffer).toBeDefined();
                expect(bar.whiteTexture).toBeDefined();
-            });                                                           
-                                                           
+            });
+            it('ThreeDBar().hexToRgb() work well', function() {
+               expect(bar.hexToRgb('#ff0000')).toEqual([1, 0, 0, 1]);
+               expect(bar.hexToRgb('#00ff00')).toEqual([0, 1, 0, 1]);
+               expect(bar.hexToRgb('#0000ff')).toEqual([0, 0, 1, 1]);
+            });                                                                       
+                                                     
         });                
               
     });
