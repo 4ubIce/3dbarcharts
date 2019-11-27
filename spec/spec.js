@@ -49,7 +49,7 @@ requirejs(['MatrixStack', 'glMatrix'], function(MatrixStack) {
         });
     });
 });
-requirejs(['ThreeDBarChart', 'ThreeDBar'], function(ThreeDBarChart, ThreeDBar) {
+requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText'], function(ThreeDBarChart, ThreeDBar, CoordinatePlaneText) {
     describe('ThreeDBarChart', function() {
     
         class MyThreeDBarChart extends ThreeDBarChart {
@@ -88,6 +88,11 @@ requirejs(['ThreeDBarChart', 'ThreeDBar'], function(ThreeDBarChart, ThreeDBar) {
         let as = -0.05;
         let ts = 28;
         let tw = 0.4;
+        let xtc = 7;
+        let ytc = 4;
+        let bw = 0.4;
+        let bh = 0.8;
+        let bc = '#fff000';
         let d =
                   [
                     {
@@ -152,7 +157,8 @@ requirejs(['ThreeDBarChart', 'ThreeDBar'], function(ThreeDBarChart, ThreeDBar) {
         let gl = barChart.gl;
         let sp = barChart.shaderProgram;
         let mvMatrix = barChart.mvMatrix;
-        let bar = new ThreeDBar(gl, sp, mvMatrix, {});
+        let bar = new ThreeDBar(gl, sp, mvMatrix, {width: bw, height: bh, barColor: bc});
+        let axis = new CoordinatePlaneText(gl, sp, mvMatrix, {xTicksCount: xtc, yTicksCount: ytc, ledge: l, text: {text: ['a1', 'a2'], size: ts, width: tw}});
         
         describe('new ThreeDBarChart()', function() {
             it('should be defined', function() {
@@ -210,16 +216,37 @@ requirejs(['ThreeDBarChart', 'ThreeDBar'], function(ThreeDBarChart, ThreeDBar) {
             });                                    
         });
         
-        describe('new ThreeDBar()', function() {
-            it('should be defined', function() {
-               expect(bar).toBeDefined();
+        describe('ThreeDBar', function() {
+            describe('new ThreeDBar()', function() {
+                it('should be defined', function() {
+                   expect(bar).toBeDefined();
+                });
+            }); 
+            
+            describe('ThreeDBarChart().loadConfig()', function() {
+                it('should fill ThreeDBarChart().cfg properly', function() {
+                    expect(bar.cfg.width).toEqual(bw);
+                    expect(bar.cfg.height).toEqual(bh);
+                    expect(bar.cfg.barColor).toEqual(bc);
+                });
             });
-            bar.init();
-            it('ThreeDBar().init() should be initialize buffer and textures', function() {
-               expect(bar.cubeVertexPositionBuffer).toBeDefined();
-               expect(bar.whiteTexture).toBeDefined();
-            });                                                           
-                                                           
+            
+            describe('ThreeDBar().init()', function() {             
+                bar.init();
+                it('should be initialize buffer and textures', function() {
+                   expect(bar.cubeVertexPositionBuffer).toBeDefined();
+                   expect(bar.whiteTexture).toBeDefined();
+                });
+            });
+            
+            describe('ThreeDBar().hexToRgb()', function() {
+                it(' work well', function() {
+                   expect(bar.hexToRgb('#ff0000')).toEqual([1, 0, 0, 1]);
+                   expect(bar.hexToRgb('#00ff00')).toEqual([0, 1, 0, 1]);
+                   expect(bar.hexToRgb('#0000ff')).toEqual([0, 0, 1, 1]);
+                });                                                                       
+            });                                            
+            
         });                
               
     });
