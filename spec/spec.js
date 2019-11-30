@@ -90,9 +90,6 @@ requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText'], function(Three
         let tw = 0.4;
         let xtc = 7;
         let ytc = 4;
-        let bw = 0.4;
-        let bh = 0.8;
-        let bc = '#fff000';
         let d =
                   [
                     {
@@ -157,8 +154,9 @@ requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText'], function(Three
         let gl = barChart.gl;
         let sp = barChart.shaderProgram;
         let mvMatrix = barChart.mvMatrix;
-        let bar = new ThreeDBar(gl, sp, mvMatrix, {width: bw, height: bh, barColor: bc});
+        
         let axis = new CoordinatePlaneText(gl, sp, mvMatrix, {xTicksCount: xtc, yTicksCount: ytc, ledge: l, text: {text: ['a1', 'a2'], size: ts, width: tw}});
+        
         
         describe('new ThreeDBarChart()', function() {
             it('should be defined', function() {
@@ -217,14 +215,20 @@ requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText'], function(Three
         });
         
         describe('ThreeDBar', function() {
+        
+            let bw = 0.4;
+            let bh = 0.8;
+            let bc = '#fff000';        
+            let bar = new ThreeDBar(gl, sp, mvMatrix, {width: bw, height: bh, barColor: bc});
+            
             describe('new ThreeDBar()', function() {
                 it('should be defined', function() {
                    expect(bar).toBeDefined();
                 });
             }); 
             
-            describe('ThreeDBarChart().loadConfig()', function() {
-                it('should fill ThreeDBarChart().cfg properly', function() {
+            describe('ThreeDBar().loadConfig()', function() {
+                it('should fill ThreeDBar().cfg properly', function() {
                     expect(bar.cfg.width).toEqual(bw);
                     expect(bar.cfg.height).toEqual(bh);
                     expect(bar.cfg.barColor).toEqual(bc);
@@ -233,13 +237,59 @@ requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText'], function(Three
             
             describe('ThreeDBar().init()', function() {             
                 bar.init();
-                it('should be initialize buffer and textures', function() {
+                it('should be initialize buffers and textures', function() {
                    expect(bar.cubeVertexPositionBuffer).toBeDefined();
+                   expect(bar.cubeVertexColorBuffer).toBeDefined();
+                   expect(bar.cubeVertexIndexBuffer).toBeDefined();
                    expect(bar.whiteTexture).toBeDefined();
                 });
             });
             
             describe('ThreeDBar().hexToRgb()', function() {
+                it(' work well', function() {
+                   expect(bar.hexToRgb('#ff0000')).toEqual([1, 0, 0, 1]);
+                   expect(bar.hexToRgb('#00ff00')).toEqual([0, 1, 0, 1]);
+                   expect(bar.hexToRgb('#0000ff')).toEqual([0, 0, 1, 1]);
+                });                                                                       
+            });                                            
+            
+        });
+        
+         describe('CoordinatePlane', function() {
+         
+            let cpw = 2.5;
+            let cph = 1.5;
+            let cpr = 90;
+            let cprx = 1;
+            let coordPlane = new CoordinatePlane(gl, sp, mvMatrix, {width: cpw, height: cph, ledge: l, rotate: cpr, xRotation: cprx});
+            console.log(coordPlane.div(11,3));
+            console.log(coordPlane.degToRad(270));
+            describe('new CoordinatePlane()', function() {
+                it('should be defined', function() {
+                   expect(coordPlane).toBeDefined();
+                });
+            }); 
+            
+            describe('CoordinatePlane().loadConfig()', function() {
+                it('should fill CoordinatePlane().cfg properly', function() {
+                    expect(coordPlane.cfg.width).toEqual(cpw);
+                    expect(coordPlane.cfg.height).toEqual(cph);
+                    expect(coordPlane.cfg.ledge).toEqual(l);
+                    expect(coordPlane.cfg.rotate).toEqual(cpr);
+                    expect(coordPlane.cfg.xRotation).toEqual(cprx);
+                });
+            });
+            
+            describe('CoordinatePlane().init()', function() {             
+                coordPlane.init();
+                it('should be initialize buffers', function() {
+                   expect(coordPlane.cubeVertexPositionBuffer).toBeDefined();
+                   expect(coordPlane.cubeVertexColorBuffer).toBeDefined();
+                   expect(coordPlane.lineVertexIndexBuffer).toBeDefined();
+                });
+            });
+            
+            describe('CoordinatePlane().hexToRgb()', function() {
                 it(' work well', function() {
                    expect(bar.hexToRgb('#ff0000')).toEqual([1, 0, 0, 1]);
                    expect(bar.hexToRgb('#00ff00')).toEqual([0, 1, 0, 1]);
