@@ -132,7 +132,7 @@ define('CoordinatePlane', ['ClassHelper'], function(ClassHelper) {
         },
         
         draw: function () {
-            
+        
             mat4.perspective(45, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
 
             this.gl.disableVertexAttribArray(this.shaderProgram.vertexNormalAttribute);

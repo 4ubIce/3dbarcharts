@@ -101,7 +101,7 @@ define('Character', ['ClassHelper'], function(ClassHelper) {
             
             context.font = size + 'px ' + font;
             this.canvas.width = this.getPowerOfTwo(context.measureText(text).width);
-            this.canvas.height = this.getPowerOfTwo(size);
+            this.canvas.height = this.getPowerOfTwo(size);                          
             context.font = size + 'px ' + font;
             context.fillStyle = this.getTextColor();
             context.textAlign = 'center';
