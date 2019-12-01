@@ -49,7 +49,8 @@ requirejs(['MatrixStack', 'glMatrix'], function(MatrixStack) {
         });
     });
 });
-requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText'], function(ThreeDBarChart, ThreeDBar, CoordinatePlaneText) {
+
+requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText', 'CoordinatePlane', 'Character'], function(ThreeDBarChart, ThreeDBar, CoordinatePlaneText, CoordinatePlane, Character) {
     describe('ThreeDBarChart', function() {
     
         class MyThreeDBarChart extends ThreeDBarChart {
@@ -90,63 +91,62 @@ requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText'], function(Three
         let tw = 0.4;
         let xtc = 7;
         let ytc = 4;
-        let d =
-                  [
-                    {
-                    2017:
-                      [
-                        {Params: "Янв", Value: 35},
-                        {Params: "Фев ", Value: 12},
-                        {Params: "Мар", Value: 5},
-                        {Params: "Апр", Value: 56},
-                        {Params: "Май", Value: 58},
-                        {Params: "Июн", Value: 78},
-                        {Params: "Июл", Value: 59},
-                        {Params: "Авг", Value: 26},
-                        {Params: "Сен", Value: 8},
-                        {Params: "Окт", Value: 24},
-                        {Params: "Ноя", Value: 38},
-                        {Params: "Дек", Value: 16}
-                      ],
-                    color: "#ff0000"
-                    },
-                    {
-                    2018:
-                      [
-                        {Params: "Янв", Value: 9},
-                        {Params: "Фев", Value: 4},
-                        {Params: "Мар", Value: 15},
-                        {Params: "Апр", Value: 62},
-                        {Params: "Май", Value: 32},
-                        {Params: "Июн", Value: 40},
-                        {Params: "Июл", Value: 7},
-                        {Params: "Авг", Value: 34},
-                        {Params: "Сен", Value: 15},
-                        {Params: "Окт", Value: 7},
-                        {Params: "Ноя", Value: 19},
-                        {Params: "Дек", Value: 53}                  
-                      ],
-                    color: "#00ff00"
-                    },
-                    {
-                    2019:
-                      [
-                        {Params: "Янв", Value: 19},
-                        {Params: "Фев", Value: 54},
-                        {Params: "Мар", Value: 32},
-                        {Params: "Апр", Value: 21},
-                        {Params: "Май", Value: 35},
-                        {Params: "Июн", Value: 62},
-                        {Params: "Июл", Value: 42},
-                        {Params: "Авг", Value: 6},
-                        {Params: "Сен", Value: 43},
-                        {Params: "Окт", Value: 52},
-                        {Params: "Ноя", Value: 24},
-                        {Params: "Дек", Value: 13}
-                      ],
-                    color: "#0000ff"
-                    }    
-                  ];
+        let d = [
+                  {
+                  2017:
+                    [
+                      {Params: "Янв", Value: 35},
+                      {Params: "Фев ", Value: 12},
+                      {Params: "Мар", Value: 5},
+                      {Params: "Апр", Value: 56},
+                      {Params: "Май", Value: 58},
+                      {Params: "Июн", Value: 78},
+                      {Params: "Июл", Value: 59},
+                      {Params: "Авг", Value: 26},
+                      {Params: "Сен", Value: 8},
+                      {Params: "Окт", Value: 24},
+                      {Params: "Ноя", Value: 38},
+                      {Params: "Дек", Value: 16}
+                    ],
+                  color: "#ff0000"
+                  },
+                  {
+                  2018:
+                    [
+                      {Params: "Янв", Value: 9},
+                      {Params: "Фев", Value: 4},
+                      {Params: "Мар", Value: 15},
+                      {Params: "Апр", Value: 62},
+                      {Params: "Май", Value: 32},
+                      {Params: "Июн", Value: 40},
+                      {Params: "Июл", Value: 7},
+                      {Params: "Авг", Value: 34},
+                      {Params: "Сен", Value: 15},
+                      {Params: "Окт", Value: 7},
+                      {Params: "Ноя", Value: 19},
+                      {Params: "Дек", Value: 53}                  
+                    ],
+                  color: "#00ff00"
+                  },
+                  {
+                  2019:
+                    [
+                      {Params: "Янв", Value: 19},
+                      {Params: "Фев", Value: 54},
+                      {Params: "Мар", Value: 32},
+                      {Params: "Апр", Value: 21},
+                      {Params: "Май", Value: 35},
+                      {Params: "Июн", Value: 62},
+                      {Params: "Июл", Value: 42},
+                      {Params: "Авг", Value: 6},
+                      {Params: "Сен", Value: 43},
+                      {Params: "Окт", Value: 52},
+                      {Params: "Ноя", Value: 24},
+                      {Params: "Дек", Value: 13}
+                    ],
+                  color: "#0000ff"
+                  }    
+                ];
         let rowCount = getRowCount(d);
         let maxBarCountByRow = Math.max.apply(Math, getBarCountByRow(d));
         let barCount = getBarCount(d);
@@ -260,10 +260,10 @@ requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText'], function(Three
             let cpw = 2.5;
             let cph = 1.5;
             let cpr = 90;
-            let cprx = 1;
+            let cprx = 1; 
+            
             let coordPlane = new CoordinatePlane(gl, sp, mvMatrix, {width: cpw, height: cph, ledge: l, rotate: cpr, xRotation: cprx});
-            console.log(coordPlane.div(11,3));
-            console.log(coordPlane.degToRad(270));
+
             describe('new CoordinatePlane()', function() {
                 it('should be defined', function() {
                    expect(coordPlane).toBeDefined();
@@ -289,15 +289,85 @@ requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText'], function(Three
                 });
             });
             
-            describe('CoordinatePlane().hexToRgb()', function() {
-                it(' work well', function() {
-                   expect(bar.hexToRgb('#ff0000')).toEqual([1, 0, 0, 1]);
-                   expect(bar.hexToRgb('#00ff00')).toEqual([0, 1, 0, 1]);
-                   expect(bar.hexToRgb('#0000ff')).toEqual([0, 0, 1, 1]);
+            describe('CoordinatePlane().div()', function() {
+                it('work well', function() {
+                   expect(coordPlane.div(11,3)).toEqual(3);
+                   expect(coordPlane.div(9,3)).toEqual(3);
+                   expect(coordPlane.div(12,3)).toEqual(4);
                 });                                                                       
             });                                            
             
+            describe('CoordinatePlane().degToRad()', function() {
+                it('work well', function() {
+                   expect(Math.round(coordPlane.degToRad(270)*100)/100).toEqual(4.71);
+                   expect(Math.round(coordPlane.degToRad(87)*100)/100).toEqual(1.52);
+                   expect(Math.round(coordPlane.degToRad(-45)*100)/100).toEqual(-0.79);
+                });                                                                       
+            });            
         });                
               
-    });
+         describe('Character', function() {
+         
+            let cx = -0.5;
+            let cy = 2.5;
+            let ctt = 'f1';
+            let cts = 12;
+            let ctc = '#ff00ff';
+            let ctw = 0.5;
+            let cr = 270;
+            let crx = 1;
+            let cry = 1;
+            
+            let character = new Character(gl, sp, mvMatrix, {x: cx, y: cy, text: {text: ctt, size: cts, color: ctc, width: ctw}, rotate: cr, xRotation: crx, yRotation: cry});
+
+            describe('new Character()', function() {
+                it('should be defined', function() {
+                   expect(character).toBeDefined();
+                });
+            }); 
+            
+            describe('Character().loadConfig()', function() {
+                it('should fill CoordinatePlane().cfg properly', function() {
+                    expect(character.cfg.x).toEqual(cx);
+                    expect(character.cfg.y).toEqual(cy);
+                    expect(character.cfg.text.text).toEqual(ctt);
+                    expect(character.cfg.text.size).toEqual(cts);
+                    expect(character.cfg.text.color).toEqual(ctc);
+                    expect(character.cfg.text.width).toEqual(ctw);
+                    expect(character.cfg.rotate).toEqual(cr);
+                    expect(character.cfg.xRotation).toEqual(crx);
+                    expect(character.cfg.yRotation).toEqual(cry);
+                });
+            });
+            
+            describe('Character().init()', function() {             
+                coordPlane.init();
+                it('should be initialize canvas, buffers and texture', function() {
+                   expect(character.canvas).toBeDefined();
+                   expect(character.squareVertexPositionBuffer).toBeDefined();
+                   expect(character.squareVertexTextureCoordBuffer).toBeDefined();
+                   expect(character.squareVertexColorBuffer).toBeDefined();
+                   expect(character.lineVertexIndexBuffer).toBeDefined();
+                   expect(character.textTexture).toBeDefined();
+                });
+            });
+            
+            describe('Character().getPowerOfTwo()', function() {
+                it('should return the nearest number that is a power of two', function() {
+                   expect(character.getPowerOfTwo(3)).toEqual(4);
+                   expect(character.getPowerOfTwo(25)).toEqual(32);
+                   expect(character.getPowerOfTwo(7.1)).toEqual(8);
+                });                                                                       
+            });                                            
+            
+            describe('Character().degToRad()', function() {
+                it('work well', function() {
+                   expect(Math.round(character.degToRad(270)*100)/100).toEqual(4.71);
+                   expect(Math.round(character.degToRad(87)*100)/100).toEqual(1.52);
+                   expect(Math.round(character.degToRad(-45)*100)/100).toEqual(-0.79);
+                });                                                                       
+            });            
+        });                
+    }); 
+             
 });
