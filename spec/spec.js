@@ -341,7 +341,7 @@ requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText', 'CoordinatePlan
             });
             
             describe('Character().init()', function() {             
-                coordPlane.init();
+                character.init();
                 it('should be initialize canvas, buffers and texture', function() {
                    expect(character.canvas).toBeDefined();
                    expect(character.squareVertexPositionBuffer).toBeDefined();
