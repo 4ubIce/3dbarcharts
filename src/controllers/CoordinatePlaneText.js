@@ -218,10 +218,6 @@ define('CoordinatePlaneText', ['CoordinatePlane','Character',
             }        
         },
 
-        div: function (val, by) {
-            return Math.trunc(val / by);
-        },
-
         degToRad: function (degrees) {
             return degrees * Math.PI / 180;
         }
