@@ -19,6 +19,38 @@ requirejs.config({
     }
 });
 
+requirejs(['ClassHelper'], function(ClassHelper) {
+    describe('ClassHelper', function() {
+
+        let ch = new ClassHelper();
+
+        describe('new ClassHelper()', function() {
+            it('should be defined', function() {
+                expect(ch).toBeDefined();
+            });
+        });
+/*        
+        describe('ClassHelper().loadConfig(cfg, config)', function() {
+
+            let m = mat4.create();
+
+            it('should push matrix into array', function() {
+                stack.push(m);
+                expect(stack.matrixStack.length).toBeGreaterThan(0);
+            });
+        });
+        
+        describe('MatrixStack().pop()', function() {
+            it('should return matrix and remove element from array', function() {
+                let m = stack.pop();
+                expect(stack.matrixStack.length).toEqual(0);
+                expect(m.length).toEqual(16);
+            });
+        });
+*/        
+    });
+});
+
 requirejs(['MatrixStack', 'glMatrix'], function(MatrixStack) {
     describe('MatrixStack', function() {
 
@@ -50,7 +82,76 @@ requirejs(['MatrixStack', 'glMatrix'], function(MatrixStack) {
     });
 });
 
-requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText', 'CoordinatePlane', 'Character'], function(ThreeDBarChart, ThreeDBar, CoordinatePlaneText, CoordinatePlane, Character) {
+requirejs(['ShaderProgramm','Shaders'], function(ShaderProgramm, Shaders) {
+    describe('ShaderProgramm', function() {
+
+        let sp = new ShaderProgramm();
+
+        describe('new ShaderProgramm()', function() {
+            it('should be defined', function() {
+                expect(sp).toBeDefined();
+            });
+        });
+        
+        sp.init(document.querySelector('.barChart1'));
+        let gl = sp.gl;
+        
+        describe('ShaderProgramm().init(element)', function() {
+            it('should init gl and shaderProgram', function() {
+                expect(sp.gl).toBeDefined();
+                expect(sp.gl.viewportWidth).toBeGreaterThan(0);
+                expect(sp.gl.viewportHeight).toBeGreaterThan(0);
+                expect(sp.shaderProgram).toBeDefined();
+                expect(sp.shaderProgram.vertexPositionAttribute).toBeDefined();
+                expect(sp.shaderProgram.vertexColorAttribute).toBeDefined();
+                expect(sp.shaderProgram.vertexNormalAttribute).toBeDefined();
+                expect(sp.shaderProgram.textureCoordAttribute).toBeDefined();
+                expect(sp.shaderProgram.pMatrixUniform).toBeDefined();
+                expect(sp.shaderProgram.mvMatrixUniform).toBeDefined();
+                expect(sp.shaderProgram.nMatrixUniform).toBeDefined();
+                expect(sp.shaderProgram.samplerUniform).toBeDefined();
+                expect(sp.shaderProgram.vColor1).toBeDefined();
+                expect(sp.shaderProgram.vColor2).toBeDefined();
+                //expect(sp.shaderProgram.useLightingUniform).toBeDefined();
+                expect(sp.shaderProgram.ambientColorUniform).toBeDefined();
+                expect(sp.shaderProgram.lightingDirectionUniform).toBeDefined();
+                expect(sp.shaderProgram.directionalColorUniform).toBeDefined();
+            });
+        });
+        
+        describe('Shaders', function() {
+        
+            let shader = new Shaders();
+        
+            describe('new Shaders()', function() {
+                it('should be defined', function() {
+                    expect(shader).toBeDefined();
+                });
+            });
+            
+            describe('Shaders().getShader(shader-fs)', function() {
+            
+                let fs = shader.getShader('shader-fs', gl);
+            
+                it('should be compile FRAGMENT_SHADER', function() {
+                    expect(gl.getShaderParameter(fs, gl.COMPILE_STATUS)).toBe(true);
+                });
+            });
+            
+            describe('Shaders().getShader(shader-vs)', function() {
+            
+                let vs = shader.getShader('shader-vs', gl);
+            
+                it('should be compile VERTEX_SHADER', function() {
+                    expect(gl.getShaderParameter(vs, gl.COMPILE_STATUS)).toBe(true);
+                });
+            });                        
+        });        
+    });
+});
+
+requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText', 'CoordinatePlane', 'Character', 'Buffers'],
+    function(ThreeDBarChart, ThreeDBar, CoordinatePlaneText, CoordinatePlane, Character, Buffers) {
     describe('ThreeDBarChart', function() {
     
         class MyThreeDBarChart extends ThreeDBarChart {
@@ -435,7 +536,28 @@ requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText', 'CoordinatePlan
                     });                                                                       
                 });            
             });
-        });                
+        });
+        
+        describe('Buffers', function() {
+      
+            let buffer = new Buffers(gl, sp);
+            
+            describe('new Buffers()', function() {
+                it('should be defined', function() {
+                   expect(buffer).toBeDefined();
+                });
+            }); 
+            
+            describe('Buffers().init()', function() {             
+                buffer.init();
+                it('should be initialize buffers', function() {
+                   expect(buffer.cubeVertexNormalBuffer).toBeDefined();
+                   expect(buffer.cubeVertexNormalBuffer.itemSize).toBeGreaterThan(0);
+                   expect(buffer.cubeVertexNormalBuffer.numItems).toBeGreaterThan(0);
+                });
+            });
+        });        
+                        
     }); 
              
 });
