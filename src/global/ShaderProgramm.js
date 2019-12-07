@@ -71,7 +71,7 @@ define('ShaderProgramm', ['Shaders'],  function(Shaders) {
             shaderProgram.ambientColorUniform = gl.getUniformLocation(shaderProgram, "uAmbientColor");
             shaderProgram.lightingDirectionUniform = gl.getUniformLocation(shaderProgram, "uLightingDirection");
             shaderProgram.directionalColorUniform = gl.getUniformLocation(shaderProgram, "uDirectionalColor");
-            
+
             return shaderProgram;               
         }, 
     }
