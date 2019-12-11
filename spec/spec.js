@@ -23,31 +23,58 @@ requirejs(['ClassHelper'], function(ClassHelper) {
     describe('ClassHelper', function() {
 
         let ch = new ClassHelper();
-
+        let cfgZ = 0;
+        let cfgTwidth = 0.3;
+        let cfg = {
+            x: 0,
+            y: 0,
+            z: cfgZ,
+            text: {
+                      text: '',            
+                      size: 24,
+                      font: 'Georgia',
+                      color: '#000000',            
+                      width: cfgTwidth,
+                      height: 0.3
+            },            
+            rotate: 0                    
+        };
+        let config = {
+            x: 2,
+            y: -1,
+            text: {
+                      text: 'x1',            
+                      size: 18,
+                      font: 'Arial',
+                      color: '#ff00ff',            
+                      height: 0.7
+            },            
+            rotate: 1                    
+        };
+                
         describe('new ClassHelper()', function() {
             it('should be defined', function() {
                 expect(ch).toBeDefined();
             });
         });
-/*        
+        
         describe('ClassHelper().loadConfig(cfg, config)', function() {
 
-            let m = mat4.create();
+            ch.loadConfig(cfg, config);
 
-            it('should push matrix into array', function() {
-                stack.push(m);
-                expect(stack.matrixStack.length).toBeGreaterThan(0);
+            it('should copy config into cfg', function() {
+                expect(cfg.x).toEqual(config.x);
+                expect(cfg.y).toEqual(config.y);
+                expect(cfg.z).toEqual(cfgZ);
+                expect(cfg.rotate).toEqual(config.rotate);
+                expect(cfg.text.text).toEqual(config.text.text);
+                expect(cfg.text.size).toEqual(config.text.size);
+                expect(cfg.text.font).toEqual(config.text.font);
+                expect(cfg.text.color).toEqual(config.text.color);
+                expect(cfg.text.width).toEqual(cfgTwidth);
+                expect(cfg.text.height).toEqual(config.text.height);
             });
         });
-        
-        describe('MatrixStack().pop()', function() {
-            it('should return matrix and remove element from array', function() {
-                let m = stack.pop();
-                expect(stack.matrixStack.length).toEqual(0);
-                expect(m.length).toEqual(16);
-            });
-        });
-*/        
     });
 });
 
