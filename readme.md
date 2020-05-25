@@ -1,5 +1,7 @@
 # 3D Bar Chart (using WebGL)
 
+![3d bar chart](logo.jpg) 
+
 ## Author
 
 **Kirill Kupriyanov**
