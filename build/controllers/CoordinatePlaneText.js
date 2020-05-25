@@ -217,6 +217,13 @@ define('CoordinatePlaneText', ['CoordinatePlane', 'Character', 'ClassHelper', 'M
             }
         },
 
+<<<<<<< HEAD
+=======
+        div: function div(val, by) {
+            return Math.trunc(val / by);
+        },
+
+>>>>>>> 762295646a700f36a8792dfc35a0f962c1299c54
         degToRad: function degToRad(degrees) {
             return degrees * Math.PI / 180;
         }
