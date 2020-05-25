@@ -1,5 +1,6 @@
-﻿'use strict';
-define('MatrixStack', function() {
+'use strict';
+
+define('MatrixStack', function () {
 
     function MatrixStack() {
         this.matrixStack = [];
@@ -8,29 +9,29 @@ define('MatrixStack', function() {
     MatrixStack.prototype = {
 
         constructor: MatrixStack,
-        
-        push: function (matrix) {
 
-            let copy;
+        push: function push(matrix) {
+
+            var copy = void 0;
 
             if (typeof mat4 !== 'undefined') {
                 copy = mat4.create();
-                mat4.set(matrix, copy);            
+                mat4.set(matrix, copy);
             } else {
-                let glMatrix = require('gl-Matrix');
+                var glMatrix = require('gl-Matrix');
                 copy = glMatrix.mat4.create();
-                glMatrix.mat4.set(matrix, copy);            
+                glMatrix.mat4.set(matrix, copy);
             };
             this.matrixStack.push(copy);
         },
 
-        pop: function () {
+        pop: function pop() {
             if (this.matrixStack.length == 0) {
-              throw "Invalid popMatrix!";
+                throw "Invalid popMatrix!";
             }
             return this.matrixStack.pop();
-        }    
-    }
+        }
+    };
 
     return MatrixStack;
 });

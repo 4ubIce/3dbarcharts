@@ -1,5 +1,6 @@
-﻿'use strict';
-define('ShaderProgramm', ['Shaders'],  function(Shaders) {
+'use strict';
+
+define('ShaderProgramm', ['Shaders'], function (Shaders) {
 
     function ShaderProgramm() {
         this.gl;
@@ -9,16 +10,16 @@ define('ShaderProgramm', ['Shaders'],  function(Shaders) {
     ShaderProgramm.prototype = {
 
         constructor: ShaderProgramm,
-        
-        init: function (element) {
+
+        init: function init(element) {
             this.gl = this.initGL(element);
             this.shaderProgram = this.initShaderProgramm(this.gl);
         },
-        
-        initGL: function (canvas) {
-        
-            let gl;   
-            
+
+        initGL: function initGL(canvas) {
+
+            var gl = void 0;
+
             try {
                 gl = canvas.getContext("webgl");
                 gl.viewportWidth = canvas.width;
@@ -27,28 +28,26 @@ define('ShaderProgramm', ['Shaders'],  function(Shaders) {
                 gl.enable(gl.DEPTH_TEST);
                 gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                            
-            } catch(e) {
-            }
+            } catch (e) {}
             if (!gl) {
-               alert("Could not initialise WebGL, sorry :-(");
+                alert("Could not initialise WebGL, sorry :-(");
             }
             return gl;
         },
 
-        initShaderProgramm: function (gl) { 
-                               
-            let shaders = new Shaders();
-            let fragmentShader = shaders.getShader('shader-fs', gl);
-            let vertexShader = shaders.getShader('shader-vs', gl);
-            let shaderProgram = gl.createProgram();
-            
+        initShaderProgramm: function initShaderProgramm(gl) {
+
+            var shaders = new Shaders();
+            var fragmentShader = shaders.getShader('shader-fs', gl);
+            var vertexShader = shaders.getShader('shader-vs', gl);
+            var shaderProgram = gl.createProgram();
+
             gl.attachShader(shaderProgram, vertexShader);
             gl.attachShader(shaderProgram, fragmentShader);
             gl.linkProgram(shaderProgram);
 
             if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-               alert("Could not initialise shaders");
+                alert("Could not initialise shaders");
             }
 
             gl.useProgram(shaderProgram);
@@ -57,10 +56,10 @@ define('ShaderProgramm', ['Shaders'],  function(Shaders) {
             shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
             gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
             shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
-            gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);         
+            gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
             shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
-            gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);        
-            
+            gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+
             shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
             shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
             shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
@@ -72,9 +71,9 @@ define('ShaderProgramm', ['Shaders'],  function(Shaders) {
             shaderProgram.lightingDirectionUniform = gl.getUniformLocation(shaderProgram, "uLightingDirection");
             shaderProgram.directionalColorUniform = gl.getUniformLocation(shaderProgram, "uDirectionalColor");
 
-            return shaderProgram;               
-        }, 
-    }
-    
+            return shaderProgram;
+        }
+    };
+
     return ShaderProgramm;
 });

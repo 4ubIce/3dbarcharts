@@ -1,9 +1,6 @@
-babel/
 node_modules/
-/nbproject/private/
 .idea/
 target/
-build/
 out/
 .gradle/
 gradle/
