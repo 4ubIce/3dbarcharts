@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 requirejs.config({
-    baseUrl: 'script',
+    baseUrl: './script',
     paths: {
 		    d3js: '../lib/d3.v5.min',
         glMatrix: '../lib/glMatrix-0.9.5.min',
@@ -19,10 +19,14 @@ requirejs.config({
     }
 });
 
-requirejs(['ClassHelper'], function(ClassHelper) {
+define(['ClassHelper', 'MatrixStack', 'glMatrix', 'ShaderProgramm', 'Shaders'
+        , 'ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText', 'CoordinatePlane', 'Character', 'Buffers']
+        , function(ClassHelper, MatrixStack, glMatrix, ShaderProgramm, Shaders, ThreeDBarChart, ThreeDBar
+        , CoordinatePlaneText, CoordinatePlane, Character, Buffers) {
+
     describe('ClassHelper', function() {
 
-        let ch = new ClassHelper();
+        let ch = new ClassHelper();   
         let cfgZ = 0;
         let cfgTwidth = 0.3;
         let cfg = {
@@ -76,9 +80,7 @@ requirejs(['ClassHelper'], function(ClassHelper) {
             });
         });
     });
-});
 
-requirejs(['MatrixStack', 'glMatrix'], function(MatrixStack) {
     describe('MatrixStack', function() {
 
         let stack = new MatrixStack();
@@ -107,9 +109,7 @@ requirejs(['MatrixStack', 'glMatrix'], function(MatrixStack) {
             });
         });
     });
-});
 
-requirejs(['ShaderProgramm','Shaders'], function(ShaderProgramm, Shaders) {
     describe('ShaderProgramm', function() {
 
         let sp = new ShaderProgramm();
@@ -175,10 +175,7 @@ requirejs(['ShaderProgramm','Shaders'], function(ShaderProgramm, Shaders) {
             });                        
         });        
     });
-});
 
-requirejs(['ThreeDBarChart', 'ThreeDBar', 'CoordinatePlaneText', 'CoordinatePlane', 'Character', 'Buffers'],
-    function(ThreeDBarChart, ThreeDBar, CoordinatePlaneText, CoordinatePlane, Character, Buffers) {
     describe('ThreeDBarChart', function() {
     
         class MyThreeDBarChart extends ThreeDBarChart {
