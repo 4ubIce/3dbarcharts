@@ -55,12 +55,12 @@ example
     }            
 }
 ```
-x - chart position on the axis X
-y - chart position on the axis Y
-ledge - protrusion of the coordinate axes beyond the edges
-animationSpeed - rotation speed
-axisTicksCount - the number of tick marks on the coordinate axes
-text - configuration of text on coordinate axes
+x - chart position on the axis X,
+y - chart position on the axis Y,
+ledge - protrusion of the coordinate axes beyond the edges,
+animationSpeed - rotation speed,
+axisTicksCount - the number of tick marks on the coordinate axes,
+text - configuration of text on coordinate axes.
 
 * If you only want to see one chart or add more, edit the files index.html and ./script/addTwoBarCharts.js
 
