@@ -18,6 +18,6 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "jasmine": "^3.5.0",
-    "mocha": "^7.2.0"
+    "mocha": "^10.2.0"
   }
 }
